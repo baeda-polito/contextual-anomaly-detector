@@ -1,7 +1,7 @@
 #  Copyright © Roberto Chiosa 2024.
 #  Email: roberto.chiosa@polito.it
-#  Last edited: 16/7/2024
-
+#  Last edited: 12/8/2024
+import argparse
 # import from default libraries and packages
 import datetime  # data
 from statistics import mean
@@ -10,7 +10,6 @@ from statistics import mean
 import plotly.express as px
 # import scipy.stats as stats
 from scipy.stats import zscore
-
 from src.cmp.anomaly_detection_functions import anomaly_detection, extract_vector_ad_temperature, \
     extract_vector_ad_energy, extract_vector_ad_cmp
 # from src.distancematrix.generator import Euclidean
@@ -24,6 +23,17 @@ from src.distancematrix.consumer.contextual_matrix_profile import ContextualMatr
 from src.distancematrix.generator.euclidean import Euclidean
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser(
+        prog='Matrix profile',
+        description='Matrix profile')
+
+    parser.add_argument('file_url', help='Path to file')
+    parser.add_argument('variable_name', help='Variable name')
+
+    args = parser.parse_args()
+
+    print(f"Arguments: {args}")
+
     # define a begin time to evaluate execution time & performance of algorithm
     begin_time = datetime.datetime.now()
 
@@ -41,8 +51,8 @@ if __name__ == '__main__':
     # k = 4 per i clusters
 
     ########################################################################################
-    electrical_load = 'Total_Power'
-    data = load_data(electrical_load)
+    raw_data = download_data(args.file_url)
+    data = load_data(raw_data, args.variable_name)
 
     # todo calcolo dal csv caricato
     obs_per_day = 96  # [observation/day]
@@ -50,7 +60,7 @@ if __name__ == '__main__':
 
     # print dataset main characteristics
     summary = f''' \n*********************\n
-              DATASET: Electrical Load dataset from {electrical_load}\n
+              DATASET: Electrical Load dataset from {args.variable_name}\n
               - From\t{data.index[0]}\n
               - To\t{data.index[len(data) - 1]}\n
               - {len(data.index[::obs_per_day])}\tdays\n

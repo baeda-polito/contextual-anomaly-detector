@@ -40,7 +40,8 @@ Run the main script through the console:
 
 ```bash
 source .venv/bin/activate
-python -m src.cmp.main
+# python -m src.cmp.main <file_url> <variable_name>
+python -m src.cmp.main test.csv Total_Power
 ```
 
 You should see in the terminal a message output like the following:

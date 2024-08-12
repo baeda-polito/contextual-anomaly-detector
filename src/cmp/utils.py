@@ -1,9 +1,9 @@
 #  Copyright © Roberto Chiosa 2024.
 #  Email: roberto.chiosa@polito.it
-#  Last edited: 16/7/2024
+#  Last edited: 12/8/2024
+import math
 import os
 
-import math
 import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
@@ -57,7 +57,13 @@ def save_report(context):
         file.write(html_content)
 
 
-def load_data(variable):
+def download_data(filepath):
+    print(f"⬇️ Downloading file from {filepath}")
+    data = pd.read_csv(os.path.join(path_to_data, "polito_raw.csv"))
+    return data
+
+
+def load_data(data_raw, variable):
     """Load data from a file
 
     :param variable:
@@ -67,7 +73,6 @@ def load_data(variable):
     :example:
     >>> load_data('data/raw/data.csv')
     """
-    data_raw = pd.read_csv(os.path.join(path_to_data, "polito_raw.csv"))
     # todo add validation on loaded data
     # subset the dataset into 3 columns
     data_raw = data_raw[['Date_Time', variable, 'AirTemp']]

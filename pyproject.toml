@@ -19,6 +19,7 @@ matplotlib = "^3.9.1"
 seaborn = "^0.13.2"
 kneed = "^0.8.5"
 jinja2 = "^3.1.4"
+argparse = "^1.4.0"
 
 
 [build-system]
