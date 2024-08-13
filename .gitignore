@@ -112,3 +112,4 @@ GitHub.sublime-settings
 .DS_Store
 !data.csv
 !example.png
+!cmp.html

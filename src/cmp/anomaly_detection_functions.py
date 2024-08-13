@@ -1,6 +1,6 @@
 #  Copyright © Roberto Chiosa 2024.
 #  Email: roberto.chiosa@polito.it
-#  Last edited: 16/7/2024
+#  Last edited: 13/8/2024
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -195,10 +195,10 @@ def gesd_esd_test(input_series, max_outliers, alpha=0.05):
 
         # Calculates the statistical test Ri = max_i*(x_i-x_bar)/sts_dv(x_i)
         max_ind = np.argmax(abs(input_series - np.mean(input_series)))
-        R_i = max(abs(input_series - np.mean(input_series))) / np.std(input_series)
+        r_i = max(abs(input_series - np.mean(input_series))) / np.std(input_series)
 
         # print('Test {}'.format(iteration))
-        # print("Test Statistics Value(R{}) : {}".format(iteration, R_i))
+        # print("Test Statistics Value(R{}) : {}".format(iteration, r_i))
 
         # compute the critical values
         # 1- alpha/(2*(A+1))  A=n-i  B=tp,n-i-1  i=1....r
@@ -210,19 +210,19 @@ def gesd_esd_test(input_series, max_outliers, alpha=0.05):
         # print("Critical Value(λ{}): {}".format(iteration, critical_value))
 
         # # check values from function
-        # if R_i > lambda_i:  # R > C:
+        # if r_i > lambda_i:  # R > C:
         #     print('{} is an outlier. R{} > λ{}: {:.4f} > {:.4f} \n'.format(input_series[max_ind], i,
-        #                                                                    i, R_i, lambda_i))
+        #                                                                    i, r_i, lambda_i))
         # else:
         #     print(
         #         '{} is not an outlier. R{}> λ{}: {:.4f} > {:.4f} \n'.format(input_series[max_ind], i,
-        #                                                                     i, R_i, lambda_i))
+        #                                                                     i, r_i, lambda_i))
 
         input_series = np.delete(input_series, max_ind)
         critical_values.append(lambda_i)
-        stats_1.append(R_i)
+        stats_1.append(r_i)
         # The number of outliers is determined by finding the largest i such that Ri > lambda_i.
-        if R_i > lambda_i:
+        if r_i > lambda_i:
             n_outliers = i
 
     # print('H0:  there are no outliers in the data')

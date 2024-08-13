@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</head>
+<main>
+    <body>
+    <div class="container py-4">
+        <!-- Report Header -->
+        <div class="pb-3 mb-4 border-bottom">
+            <h1>{{ title }}</h1>
+            <p>{{ subtitle }}</p>
+        </div>
+
+        <!-- Summary -->
+        <div class="p-0 mb-4">
+            <h2>{{ summary.title }}</h2>
+            <p>{{ summary.content }}</p>
+            {{ summary.plot }}
+        </div>
+
+        <!--  Contexts -->
+        {% for context in contexts %}
+        <br>
+        <div class="h-100 p-5 bg-body-tertiary border rounded-3">
+            <div class="row align-items-md-stretch top">
+                <div class="col-md-7 p-5 mb-4">
+                    <h2>{{ context.title }}</h2>
+                    <p class="text-muted">{{ context.subtitle }}</p>
+                    <p>{{ context.content }}</p>
+                </div>
+                <div class="col-md-5 p-0 mb-4">
+                    {{ context.plot }}
+                </div>
+            </div>
+            {% for cluster in context.clusters %}
+
+            {% if cluster.plot_anomalies %}
+            <div class="row align-items-md-stretch border-top">
+                <div class="col-md-12 pt-5 pb-0 pl-5 pr-5 mb-4 bg-body-tertiary">
+                    <h3>{{ cluster.title }}</h3>
+                    <p>{{ cluster.content }}</p>
+                    {{cluster.table}}
+                </div>
+            </div>
+            <div class="row align-items-md-stretch">
+                <div class="col-md-7 p-0 mb-4">
+                    {{ cluster.plot_anomalies }}
+                </div>
+                <div class="col-md-5 p-0 mb-4">
+                    {{ cluster.plot }}
+                </div>
+            </div>
+
+
+            {% else %}
+            <div class="row align-items-md-stretch border-top">
+                <div class="col-md-7 p-5 mb-4 bg-body-tertiary">
+                    <h3>{{ cluster.title }}</h3>
+                    <p>{{ cluster.content }}</p>
+                </div>
+                <div class="col-md-5 p-0 mb-4">
+                    {{ cluster.plot }}
+                </div>
+            </div>
+            {% endif %}
+
+            {% endfor %}
+        </div>
+        {% endfor %}
+
+
+        <footer class="pt-3 mt-4 text-muted border-top">
+            <p>{{ footer_text }}</p>
+        </footer>
+    </div>
+
+    </body>
+</main>
+</html>

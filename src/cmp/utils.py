@@ -66,7 +66,7 @@ def download_data(filepath: str) -> pd.DataFrame:
     Download data from a user specified path
 
     The input dataset via an HTTP URL. The tool should then download the dataset from that URL;
-    since it's a presigned URL, the tool would not need to deal with authentication—it can just download
+    since it's a pre-signed URL, the tool would not need to deal with authentication—it can just download
     the dataset directly.
 
     :param filepath:
@@ -116,11 +116,10 @@ def process_data(data_raw: pd.DataFrame, variable: str) -> tuple:
         raise
 
 
-def ensure_dir(dir_path):
+def ensure_dir(dir_path: str) -> None:
     """Ensures that the directory exists
 
-    :param file_path: path to the file
-    :type file_path: str
+    :param dir_path: path to the file
 
     :example:
     >>> ensure_dir('data/processed')
@@ -129,7 +128,7 @@ def ensure_dir(dir_path):
         os.makedirs(dir_path)
 
 
-def hour_to_dec(hour_str):
+def hour_to_dec(hour_str: str) -> float:
     """ Transforms float hours from HH:MM string format to float with decimal places
 
     :param hour_str: hour in format HH:MM
@@ -148,7 +147,7 @@ def hour_to_dec(hour_str):
     return hour_dec
 
 
-def dec_to_hour(hour_dec):
+def dec_to_hour(hour_dec: float) -> str:
     """ Transforms float hours with decimal places into HH:MM string format
 
     :param hour_dec: hour in numerical format
@@ -231,7 +230,7 @@ def nan_diag(matrix):
     return matrix_nan
 
 
-def CMP_plot(contextual_mp,
+def cmp_plot(contextual_mp,
              palette="viridis",
              title=None,
              xlabel=None,
