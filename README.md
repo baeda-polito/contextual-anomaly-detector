@@ -52,7 +52,27 @@ as `input_file` argument as follows:
 
 ### Data format
 
-todo
+The tool requires the user to provide a csv file as input that contains electrical power timeseries for a specific
+building, meter or energy system (e.g., whole building electrical power timeseries). The `csv` is a wide table format as
+follows:
+
+```csv
+timestamp,column_1,temp
+2019-01-01 00:00:00,116.4,-0.6
+2019-01-01 00:15:00,125.6,-0.9
+2019-01-01 00:30:00,119.2,-1.2
+```
+
+The csv must have the following columns:
+
+- `timestamp` [case sensitive]: The timestamp of the observation in the format `YYYY-MM-DD HH:MM:SS`. This column is
+  supposed to be in
+  UTC timezone string format. It will be internally transformed by the tool into the index of the dataframe.
+- `temp` [case sensitive]: Contains the external air temperature in Celsius degrees. This column is required to perform
+  thermal sensitive
+  analysis on the electrical load.
+- `column_1`: Then the dataframe may have `N` arbitrary columns that refers to electrical load time series. The user has
+  to specify the column name that refers to the electrical load time series in the `variable_name` argument.
 
 ### Run locally
 
@@ -62,6 +82,7 @@ Create virtual environment and activate it and install dependencies:
   ```bash
   make setup
   ```
+
 - Linux:
   ```bash
   python3 -m venv .venv
