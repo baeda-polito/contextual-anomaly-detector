@@ -1,6 +1,6 @@
 #  Copyright © Roberto Chiosa 2024.
 #  Email: roberto.chiosa@polito.it
-#  Last edited: 12/8/2024
+#  Last edited: 13/8/2024
 import argparse
 # import from default libraries and packages
 import datetime  # data
@@ -10,6 +10,7 @@ from statistics import mean
 import plotly.express as px
 # import scipy.stats as stats
 from scipy.stats import zscore
+
 from src.cmp.anomaly_detection_functions import anomaly_detection, extract_vector_ad_temperature, \
     extract_vector_ad_energy, extract_vector_ad_cmp
 # from src.distancematrix.generator import Euclidean
@@ -23,17 +24,21 @@ from src.distancematrix.consumer.contextual_matrix_profile import ContextualMatr
 from src.distancematrix.generator.euclidean import Euclidean
 
 if __name__ == '__main__':
+
+    # setup logging
+    logger = logging.getLogger(__name__)
+    logging.basicConfig(level=logging.INFO, format='%(asctime)s [%(levelname)s](%(name)s) %(message)s')
+
+    # setup argument parser
     parser = argparse.ArgumentParser(
-        prog='Matrix profile',
+        prog='Matrix profile CLI',
         description='Matrix profile')
-
-    parser.add_argument('file_url', help='Path to file')
-    parser.add_argument('variable_name', help='Variable name')
-
+    parser.add_argument('input_file', help='Path to file', type=str)
+    parser.add_argument('variable_name', help='Variable name', type=str)
+    parser.add_argument('output_file', help='Path to the output file', type=str)
     args = parser.parse_args()
 
-    print(f"Arguments: {args}")
-
+    ########################################################################################
     # define a begin time to evaluate execution time & performance of algorithm
     begin_time = datetime.datetime.now()
 
@@ -45,18 +50,15 @@ if __name__ == '__main__':
         'contexts': []
     }
 
+    logger.info(f"Arguments: {args}")
+
     # automatically identify the number of time windows
     # time window equal bin oppure con cart
     # set mcontext
     # k = 4 per i clusters
 
-    ########################################################################################
-    raw_data = download_data(args.file_url)
-    data = load_data(raw_data, args.variable_name)
-
-    # todo calcolo dal csv caricato
-    obs_per_day = 96  # [observation/day]
-    obs_per_hour = 4  # [observation/hour]
+    raw_data = download_data(args.input_file)
+    data, obs_per_day, obs_per_hour = process_data(raw_data, args.variable_name)
 
     # print dataset main characteristics
     summary = f''' \n*********************\n
@@ -424,7 +426,7 @@ if __name__ == '__main__':
     total_time = datetime.datetime.now() - begin_time
     hours, remainder = divmod(total_time.total_seconds(), 3600)
     minutes, seconds = divmod(remainder, 60)
-    print('\n*********************\n' + "END: " + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-    print("TOTAL " + str(int(minutes)) + ' min ' + str(int(seconds)) + ' s')
+    print('\n*********************\n')
+    logger.info(f"TOTAL {str(int(minutes))} min {str(int(seconds))} s")
 
-    save_report(report_content)
+    save_report(report_content, args.output_file)

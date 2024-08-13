@@ -13,7 +13,7 @@ clustering etc.
   i.e., `distancematrix`).
 - `pyproject.toml`: Contains metadata about the project, dependencies and configurations
 
-## Getting started
+## Setup
 
 Create virtual environment and activate it and install dependencies:
 
@@ -36,28 +36,74 @@ Create virtual environment and activate it and install dependencies:
   poetry install
   ```
 
-Run the main script through the console:
+## Basic usage
+
+The tool comes with a cli that helps you to execute the script with the desired commands
+
+```bash 
+$ python -m src.cmp.main -h
+
+Matrix profile
+
+positional arguments:
+  input_file     Path to file
+  variable_name  Variable name
+  output_file    Path to the output file
+
+options:
+  -h, --help     show this help message and exit
+```
+
+The arguments to pass to the script are the following:
+
+* `input_file`: The input dataset via an HTTP URL. The tool should then download the dataset from that URL; since it's a
+  presigned URL,
+  the tool would not need to deal with authentication—it can just download the dataset directly.
+* `variable_name`: The variable name to be used for the analysis (i.e., the column of the csv that contains the
+  electrical load under analysis).
+* `output_file`: The local path to the output HTML report. The platform would then get that HTML report and upload it to
+  the object
+  storage service for the user to review later.
+
+You can run the main script through the console using either local files or download data from an external url. This
+repository comes with a sample dataset (data.csv) that you can use to generate a report and you can pass the local path
+as
+`input_file` argument as follows:
 
 ```bash
 source .venv/bin/activate
-# python -m src.cmp.main <file_url> <variable_name>
-python -m src.cmp.main test.csv Total_Power
+python -m src.cmp.main data/data.csv Total_Power results/reports/report.html
 ```
 
-You should see in the terminal a message output like the following:
+You should see in the terminal the algorithm execution as the following:
 
 ```txt
+2024-08-13 12:31:04,907 [INFO](__main__) Arguments: Namespace(input_file='data/data.csv', variable_name='Total_Power', output_file='results/report.html')
+2024-08-13 12:31:04,907 [INFO](src.cmp.utils) ⬇️ Downloading file from <data/data.csv>
+2024-08-13 12:31:04,965 [INFO](src.cmp.utils) 📊 Data processed successfully
+
+*********************
 CONTEXT 1 : Subsequences of 05:45 h (m = 23) that start in [00:00,01:00) (ctx_from00_00_to01_00_m05_45)
 99.997%        0.0 sec
 
-- Cluster 1 (1.181 s)   -> 1 anomalies
-- Cluster 2 (0.508 s)   -> 3 anomalies
-- Cluster 3 (0.473 s)   -> 4 anomalies
-- Cluster 4 (0.658 s)   -> 5 anomalies
-- Cluster 5 (-)         -> no anomalies green
+- Cluster 1 (1.045 s) 	-> 1 anomalies
+- Cluster 2 (0.307 s) 	-> 3 anomalies
+- Cluster 3 (0.329 s) 	-> 4 anomalies
+- Cluster 4 (0.505 s) 	-> 5 anomalies
+- Cluster 5 (-) 		-> no anomalies green
+
+[...]
+
+END: 2024-08-13 12:31:40
+TOTAL 0 min 36 s
+2024-08-13 12:31:04,907 [INFO](__main__) 
+2024-08-13 12:31:46,114 [INFO](src.cmp.utils) 🎉 Report generated successfully on results/report.html
+
+Process finished with exit code 0
 ```
 
-At the end of the execution you can find the results in the [`results`](src/cmp/results) folder.
+At the end of the execution you can find the report in the path specified by the `output_file` argument, in this case
+you will find it in the [`results`](src/cmp/results) folder.
 
 ## Run using docker
 

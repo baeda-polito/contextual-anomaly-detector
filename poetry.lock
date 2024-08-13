@@ -304,6 +304,16 @@ plot = ["matplotlib (>=2.2.5)"]
 testing = ["matplotlib (>=2.2.5)", "pytest (>=5.0.1)", "pytest-cov (>=3.0.0)"]
 
 [[package]]
+name = "logger"
+version = "1.4"
+description = "Python logging helper"
+optional = false
+python-versions = "*"
+files = [
+    {file = "logger-1.4.tar.gz", hash = "sha256:4ecac57133c6376fa215f0fe6b4dc4d60e4d1ad8be005cab4e8a702df682f8b3"},
+]
+
+[[package]]
 name = "markupsafe"
 version = "2.1.5"
 description = "Safely add untrusted strings to HTML/XML markup."
@@ -810,4 +820,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "20832dd6c3ff4b80d05150b8846b0bdfddfd72236af53a38008db2be8b9f6fd6"
+content-hash = "8c967b87a1a98f8cc988395aca349d801f313d7b9b764477478af221c3f9c09e"
