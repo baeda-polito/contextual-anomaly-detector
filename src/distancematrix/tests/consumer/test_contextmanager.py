@@ -1,8 +1,13 @@
-from unittest import TestCase
-import numpy.testing as npt
-from itertools import zip_longest
+#  Copyright © Roberto Chiosa 2024.
+#  Email: roberto.chiosa@polito.it
+#  Last edited: 16/7/2024
 
-from distancematrix.consumer.contextmanager import GeneralStaticManager
+from itertools import zip_longest
+from unittest import TestCase
+
+import numpy.testing as npt
+
+from src.distancematrix.consumer.contextmanager import GeneralStaticManager
 
 
 class TestGeneralStaticManager(TestCase):

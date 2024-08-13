@@ -1,29 +1,44 @@
+#  Copyright © Roberto Chiosa 2024.
+#  Email: roberto.chiosa@polito.it
+#  Last edited: 13/8/2024
+import argparse
 # import from default libraries and packages
 import datetime  # data
-import os
 from statistics import mean
 
-# import matplotlib.pyplot as plt  # plots
-import numpy as np  # general data manipulation
-import pandas as pd  # dataframe handling
+# import matplotlib.pyplot as  plt  # plots
 import plotly.express as px
 # import scipy.stats as stats
 from scipy.stats import zscore
 
 from src.cmp.anomaly_detection_functions import anomaly_detection, extract_vector_ad_temperature, \
     extract_vector_ad_energy, extract_vector_ad_cmp
+# from src.distancematrix.generator import Euclidean
+# import from custom modules useful functions
+from src.cmp.utils import *
 # import from the local module distancematrix
 from src.distancematrix.calculator import AnytimeCalculator
 # from src.distancematrix.consumer import ContextualMatrixProfile
 from src.distancematrix.consumer.contextmanager import GeneralStaticManager
 from src.distancematrix.consumer.contextual_matrix_profile import ContextualMatrixProfile
 from src.distancematrix.generator.euclidean import Euclidean
-# from src.distancematrix.generator import Euclidean
-# import from custom modules useful functions
-from src.cmp.utils import hour_to_dec, dec_to_hour, nan_diag, dec_to_obs, ensure_dir, load_data, save_report, \
-    path_to_data, path_to_figures
 
 if __name__ == '__main__':
+
+    # setup logging
+    logger = logging.getLogger(__name__)
+    logging.basicConfig(level=logging.INFO, format='%(asctime)s [%(levelname)s](%(name)s) %(message)s')
+
+    # setup argument parser
+    parser = argparse.ArgumentParser(
+        prog='Matrix profile CLI',
+        description='Matrix profile')
+    parser.add_argument('input_file', help='Path to file', type=str)
+    parser.add_argument('variable_name', help='Variable name', type=str)
+    parser.add_argument('output_file', help='Path to the output file', type=str)
+    args = parser.parse_args()
+
+    ########################################################################################
     # define a begin time to evaluate execution time & performance of algorithm
     begin_time = datetime.datetime.now()
 
@@ -35,33 +50,19 @@ if __name__ == '__main__':
         'contexts': []
     }
 
-    # from global variables load todo: simplify the wau global variables are defined
-    global_variables = pd.read_csv(os.path.join(path_to_data, "global_variables.csv"), header=0)
-    color_palette = 'viridis'
-    dpi_resolution = 300
-    fontsize = 10
-    line_style_context = '-'
-    line_style_other = ':'
-    line_color_context = '#D83C3B'
-    line_color_other = '#D5D5E0'
-    line_size = 1
+    logger.info(f"Arguments: {args}")
 
     # automatically identify the number of time windows
     # time window equal bin oppure con cart
     # set mcontext
     # k = 4 per i clusters
 
-    ########################################################################################
-    electrical_load = 'Total_Power'
-    data = load_data(electrical_load)
-
-    # todo calcolo dal csv caricato
-    obs_per_day = 96  # [observation/day]
-    obs_per_hour = 4  # [observation/hour]
+    raw_data = download_data(args.input_file)
+    data, obs_per_day, obs_per_hour = process_data(raw_data, args.variable_name)
 
     # print dataset main characteristics
     summary = f''' \n*********************\n
-              DATASET: Electrical Load dataset from {electrical_load}\n
+              DATASET: Electrical Load dataset from {args.variable_name}\n
               - From\t{data.index[0]}\n
               - To\t{data.index[len(data) - 1]}\n
               - {len(data.index[::obs_per_day])}\tdays\n
@@ -187,7 +188,8 @@ if __name__ == '__main__':
 
         # USe colorscale consistent in eaxh context
         val_min = 0
-        val_max = np.nanmax(cmp.distance_matrix * np.isfinite(cmp.distance_matrix))
+        # Find the maximum value among the finite values
+        val_max = np.nanmax(cmp.distance_matrix[np.isfinite(cmp.distance_matrix)])
 
         fig = px.imshow(cmp.distance_matrix, zmin=val_min, zmax=round(val_max),
                         labels=dict(color="Distance"),
@@ -424,7 +426,7 @@ if __name__ == '__main__':
     total_time = datetime.datetime.now() - begin_time
     hours, remainder = divmod(total_time.total_seconds(), 3600)
     minutes, seconds = divmod(remainder, 60)
-    print('\n*********************\n' + "END: " + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-    print("TOTAL " + str(int(minutes)) + ' min ' + str(int(seconds)) + ' s')
+    print('\n*********************\n')
+    logger.info(f"TOTAL {str(int(minutes))} min {str(int(seconds))} s")
 
-    save_report(report_content)
+    save_report(report_content, args.output_file)

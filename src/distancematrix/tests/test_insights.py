@@ -1,9 +1,14 @@
-import numpy as np
+#  Copyright © Roberto Chiosa 2024.
+#  Email: roberto.chiosa@polito.it
+#  Last edited: 16/7/2024
+
 from unittest import TestCase
+
+import numpy as np
 import numpy.testing as npt
 
-from distancematrix.insights import lowest_value_idxs
-from distancematrix.insights import highest_value_idxs
+from src.distancematrix.insights import highest_value_idxs
+from src.distancematrix.insights import lowest_value_idxs
 
 
 class TestSlidingMeanStd(TestCase):

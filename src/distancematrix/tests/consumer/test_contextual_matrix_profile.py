@@ -1,13 +1,17 @@
+#  Copyright © Roberto Chiosa 2024.
+#  Email: roberto.chiosa@polito.it
+#  Last edited: 16/7/2024
+
 from typing import Iterable, Tuple
+from unittest import TestCase
 
 import numpy as np
-from unittest import TestCase
 import numpy.testing as npt
 
-from distancematrix.util import diag_indices_of
-from distancematrix.consumer.contextual_matrix_profile import ContextualMatrixProfile
-from distancematrix.consumer.contextmanager import GeneralStaticManager
-from distancematrix.consumer.contextmanager import AbstractContextManager
+from src.distancematrix.consumer.contextmanager import AbstractContextManager
+from src.distancematrix.consumer.contextmanager import GeneralStaticManager
+from src.distancematrix.consumer.contextual_matrix_profile import ContextualMatrixProfile
+from src.distancematrix.util import diag_indices_of
 
 
 class TestContextualMatrixProfile(TestCase):
@@ -338,14 +342,14 @@ class TestStreamingContextualMatrixProfile(TestCase):
         cdm.process_column(0, np.atleast_2d(self.dist_matrix[0:4, 0]))
         cdm.process_column(2, np.atleast_2d(self.dist_matrix[0:4, 2]))
 
-        npt.assert_equal(cdm.distance_matrix, [[7.2, 0.5, np.Inf, np.Inf], [5.3, 5.8, np.Inf, np.Inf]])
+        npt.assert_equal(cdm.distance_matrix, [[7.2, 0.5, np.inf, np.inf], [5.3, 5.8, np.inf, np.inf]])
         npt.assert_equal(cdm.match_index_query, [[2, 0, -1, -1], [3, 3, -1, -1]])
         npt.assert_equal(cdm.match_index_series, [[0, 2, -1, -1], [0, 2, -1, -1]])
 
         cdm.shift_series(1)
         cdm.shift_query(2)
 
-        npt.assert_equal(cdm.distance_matrix, [[7.2, 0.5, np.Inf, np.Inf], [5.3, 5.8, np.Inf, np.Inf]])
+        npt.assert_equal(cdm.distance_matrix, [[7.2, 0.5, np.inf, np.inf], [5.3, 5.8, np.inf, np.inf]])
         npt.assert_equal(cdm.match_index_query, [[2, 0, -1, -1], [3, 3, -1, -1]])
         npt.assert_equal(cdm.match_index_series, [[0, 2, -1, -1], [0, 2, -1, -1]])
 
@@ -353,14 +357,14 @@ class TestStreamingContextualMatrixProfile(TestCase):
         cdm.process_column(1, np.atleast_2d(self.dist_matrix[2:6, 2]))
         cdm.process_column(3, np.atleast_2d(self.dist_matrix[2:6, 4]))
 
-        npt.assert_equal(cdm.distance_matrix, [[3.1, 0.5, 8.0, np.Inf], [4.8, 2.3, 2.1, np.Inf]])
+        npt.assert_equal(cdm.distance_matrix, [[3.1, 0.5, 8.0, np.inf], [4.8, 2.3, 2.1, np.inf]])
         npt.assert_equal(cdm.match_index_query, [[2, 0, 2, -1], [4, 5, 4, -1]])
         npt.assert_equal(cdm.match_index_series, [[1, 2, 4, -1], [1, 2, 4, -1]])
 
         cdm.shift_series(1)
         cdm.shift_query(2)
 
-        npt.assert_equal(cdm.distance_matrix, [[2.3, 2.1, np.Inf, np.Inf], [np.Inf, np.Inf, np.Inf, np.Inf]])
+        npt.assert_equal(cdm.distance_matrix, [[2.3, 2.1, np.inf, np.inf], [np.inf, np.inf, np.inf, np.inf]])
         npt.assert_equal(cdm.match_index_query, [[5, 4, -1, -1], [-1, -1, -1, -1]])
         npt.assert_equal(cdm.match_index_series, [[2, 4, -1, -1], [-1, -1, -1, -1]])
 
@@ -369,7 +373,7 @@ class TestStreamingContextualMatrixProfile(TestCase):
         cdm.process_column(4, np.atleast_2d(self.dist_matrix[4:8, 6]))
         cdm.process_column(5, np.atleast_2d(self.dist_matrix[4:8, 7]))
 
-        npt.assert_equal(cdm.distance_matrix, [[1.2, 2.1, 1.2, np.Inf], [1.2, 7.5, 2.5, np.Inf]])
+        npt.assert_equal(cdm.distance_matrix, [[1.2, 2.1, 1.2, np.inf], [1.2, 7.5, 2.5, np.inf]])
         npt.assert_equal(cdm.match_index_query, [[6, 4, 4, -1], [6, 7, 7, -1]])
         npt.assert_equal(cdm.match_index_series, [[2, 4, 6, -1], [2, 5, 6, -1]])
 
@@ -382,7 +386,7 @@ class TestStreamingContextualMatrixProfile(TestCase):
         cdm.process_diagonal(2, np.atleast_2d(v[diag_indices_of(v, 2)]))
         cdm.process_diagonal(-1, np.atleast_2d(v[diag_indices_of(v, -1)]))
 
-        npt.assert_equal(cdm.distance_matrix, [[3.1, 0.5, 8., np.Inf], [np.Inf, 5.8, 1., np.Inf]])
+        npt.assert_equal(cdm.distance_matrix, [[3.1, 0.5, 8., np.inf], [np.inf, 5.8, 1., np.inf]])
         npt.assert_equal(cdm.match_index_query, [[2, 0, 2, -1], [-1, 3, 3, -1]])
         npt.assert_equal(cdm.match_index_series, [[1, 2, 4, -1], [-1, 2, 5, -1]])
 
@@ -390,7 +394,7 @@ class TestStreamingContextualMatrixProfile(TestCase):
         cdm.shift_query(2)
         v = self.dist_matrix[2:6, 1:7]
 
-        npt.assert_equal(cdm.distance_matrix, [[3.1, 0.5, 8., np.Inf], [np.Inf, 5.8, 1., np.Inf]])
+        npt.assert_equal(cdm.distance_matrix, [[3.1, 0.5, 8., np.inf], [np.inf, 5.8, 1., np.inf]])
         npt.assert_equal(cdm.match_index_query, [[2, 0, 2, -1], [-1, 3, 3, -1]])
         npt.assert_equal(cdm.match_index_series, [[1, 2, 4, -1], [-1, 2, 5, -1]])
 
@@ -399,7 +403,7 @@ class TestStreamingContextualMatrixProfile(TestCase):
         cdm.process_diagonal(0, np.atleast_2d(v[diag_indices_of(v, 0)]))
         cdm.process_diagonal(-3, np.atleast_2d(v[diag_indices_of(v, -3)]))
 
-        npt.assert_equal(cdm.distance_matrix, [[3.1, 0.5, 8., 2.7], [8.1, 5.8, 1., np.Inf]])
+        npt.assert_equal(cdm.distance_matrix, [[3.1, 0.5, 8., 2.7], [8.1, 5.8, 1., np.inf]])
         npt.assert_equal(cdm.match_index_query, [[2, 0, 2, 2], [5, 3, 3, -1]])
         npt.assert_equal(cdm.match_index_series, [[1, 2, 4, 6], [1, 2, 5, -1]])
 
@@ -407,7 +411,7 @@ class TestStreamingContextualMatrixProfile(TestCase):
         cdm.shift_query(2)
         v = self.dist_matrix[4:8, 2:8]
 
-        npt.assert_equal(cdm.distance_matrix, [[5.8, 1., np.Inf, np.Inf], [np.Inf, np.Inf, np.Inf, np.Inf]])
+        npt.assert_equal(cdm.distance_matrix, [[5.8, 1., np.inf, np.inf], [np.inf, np.inf, np.inf, np.inf]])
         npt.assert_equal(cdm.match_index_query, [[3, 3, -1, -1], [-1, -1, -1, -1]])
         npt.assert_equal(cdm.match_index_series, [[2, 5, -1, -1], [-1, -1, -1, -1]])
 
@@ -418,6 +422,6 @@ class TestStreamingContextualMatrixProfile(TestCase):
         cdm.process_diagonal(3, np.atleast_2d(v[diag_indices_of(v, 3)]))
         cdm.process_diagonal(4, np.atleast_2d(v[diag_indices_of(v, 4)]))
 
-        npt.assert_equal(cdm.distance_matrix, [[1.2, 1., 1.2, np.Inf], [1.2, 3.7, 2.5, np.Inf]])
+        npt.assert_equal(cdm.distance_matrix, [[1.2, 1., 1.2, np.inf], [1.2, 3.7, 2.5, np.inf]])
         npt.assert_equal(cdm.match_index_query, [[6, 3, 4, -1], [6, 6, 7, -1]])
         npt.assert_equal(cdm.match_index_series, [[2, 5, 6, -1], [2, 4, 6, -1]])

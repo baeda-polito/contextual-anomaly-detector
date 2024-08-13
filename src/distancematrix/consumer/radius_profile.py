@@ -1,9 +1,13 @@
+#  Copyright © Roberto Chiosa 2024.
+#  Email: roberto.chiosa@polito.it
+#  Last edited: 16/7/2024
+
 from typing import Union, List
 
 import numpy as np
 
-from distancematrix.consumer.abstract_consumer import AbstractConsumer
-from distancematrix.insights import lowest_value_idxs
+from src.distancematrix.consumer.abstract_consumer import AbstractConsumer
+from src.distancematrix.insights import lowest_value_idxs
 
 
 class RadiusProfile0(AbstractConsumer):

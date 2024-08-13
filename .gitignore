@@ -110,3 +110,5 @@ GitHub.sublime-settings
 *.csv
 *.png
 .DS_Store
+!data.csv
+!example.png

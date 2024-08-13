@@ -1,16 +1,21 @@
+#  Copyright © Roberto Chiosa 2024.
+#  Email: roberto.chiosa@polito.it
+#  Last edited: 16/7/2024
+
 from unittest import TestCase
+
 import numpy as np
 import numpy.testing as npt
 
-from distancematrix.util import diag_length
-from distancematrix.util import diag_indices
-from distancematrix.util import diag_indices_of
-from distancematrix.util import cut_indices_of
-from distancematrix.util import shortest_path_distances
-from distancematrix.util import shortest_path
-from distancematrix.util import sliding_min
-from distancematrix.util import sliding_max
-from distancematrix.util import sliding_window_view
+from src.distancematrix.util import cut_indices_of
+from src.distancematrix.util import diag_indices
+from src.distancematrix.util import diag_indices_of
+from src.distancematrix.util import diag_length
+from src.distancematrix.util import shortest_path
+from src.distancematrix.util import shortest_path_distances
+from src.distancematrix.util import sliding_max
+from src.distancematrix.util import sliding_min
+from src.distancematrix.util import sliding_window_view
 
 
 class TestUtil(TestCase):

@@ -1,8 +1,13 @@
-import numpy as np
+#  Copyright © Roberto Chiosa 2024.
+#  Email: roberto.chiosa@polito.it
+#  Last edited: 16/7/2024
+
 from unittest import TestCase
+
+import numpy as np
 import numpy.testing as npt
 
-import distancematrix.math_tricks as math_tricks
+import src.distancematrix.math_tricks as math_tricks
 
 
 def brute_sliding_mean(data, m):
@@ -15,6 +20,7 @@ def brute_sliding_var(data, m):
 
 def brute_sliding_std(data, m):
     return np.array([np.std(data[i:i + m]) for i in range(len(data) - m + 1)])
+
 
 MEAN_STABILITY_DATA = np.array([
     0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,

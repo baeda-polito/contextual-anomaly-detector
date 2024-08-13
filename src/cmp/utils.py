@@ -1,4 +1,7 @@
-# import from default libraries and packages
+#  Copyright © Roberto Chiosa 2024.
+#  Email: roberto.chiosa@polito.it
+#  Last edited: 13/8/2024
+import logging
 import math
 import os
 
@@ -15,6 +18,18 @@ path_to_figures = os.path.join(os.path.dirname(__file__), 'results', 'figures')
 path_to_reports = os.path.join(os.path.dirname(__file__), 'results', 'reports')
 path_to_templates = os.path.join(os.path.dirname(__file__), 'templates')
 
+color_palette = 'viridis'
+dpi_resolution = 300
+fontsize = 10
+line_style_context = '-'
+line_style_other = ':'
+line_color_context = '#D83C3B'
+line_color_other = '#D5D5E0'
+line_size = 1
+
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO, format='%(asctime)s [%(levelname)s](%(name)s) %(message)s')
+
 
 def calculate_time_windows():
     """
@@ -25,47 +40,73 @@ def calculate_time_windows():
     return df
 
 
-def save_report(context):
+def save_report(context, filepath: str) -> None:
     """Save the report to a file
 
     :param context: context of the report
-    :type context: dict
+    :param filepath: path to save the report
 
-    :example:
-    >>> save_report(context)
     """
     # Set up the Jinja2 environment for report
-    env = Environment(loader=FileSystemLoader('.'))
-    template = env.get_template(os.path.join(path_to_templates, 'cmp.html'))
+    env = Environment(loader=FileSystemLoader(path_to_templates))
+    template = env.get_template('cmp.html')
 
     # Render the template with the data
     html_content = template.render(context)
 
     # Save the rendered HTML to a file (optional, for inspection)
-    with open(os.path.join(path_to_reports, 'report_cmp.html'), 'w') as file:
+    with open(filepath, 'w') as file:
         file.write(html_content)
+        logger.info(f'🎉 Report generated successfully on {filepath}')
 
 
-def load_data(variable):
+def download_data(filepath: str) -> pd.DataFrame:
+    """
+    Download data from a user specified path
+
+    The input dataset via an HTTP URL. The tool should then download the dataset from that URL;
+    since it's a presigned URL, the tool would not need to deal with authentication—it can just download
+    the dataset directly.
+
+    :param filepath:
+    :return: data
+    """
+    logger.info(f"⬇️ Downloading file from <{filepath}>")
+    data = pd.read_csv(filepath)
+    return data
+
+
+def process_data(data_raw: pd.DataFrame, variable: str) -> tuple:
     """Load data from a file
-
+    the data should always have timestamp ant temperature and n columns with electrical loads names in a custom way.
+    This function transforms the dataset into a 3 column format renaming the desired column with "value" name
+    :param data_raw:
     :param variable:
     :return data: data from the file
-    :rtype data: pd.DataFrame
-
-    :example:
-    >>> load_data('data/raw/data.csv')
+    :return obs_per_day: number of observations per day
+    :return obs_per_hour: number of observations per hour
     """
-    data_raw = pd.read_csv(os.path.join(path_to_data, "polito_raw.csv"))
-    # subset the dataset into 3 columns
-    data_raw = data_raw[['Date_Time', variable, 'AirTemp']]
-    # rename columns
-    data_raw = data_raw.rename(columns={"Date_Time": "timestamp", variable: "value", "AirTemp": "temp"})
-    # convert timestamp to datetime
-    data_raw['timestamp'] = pd.to_datetime(data_raw['timestamp'])
-    data_raw = data_raw.set_index('timestamp')
-    data = data_raw.copy()  # todo preprocess if necessary
-    return data
+    try:
+        # subset the dataset into 3 columns
+        data_raw = data_raw[['timestamp', variable, 'temp']]
+        # rename columns
+        data_raw = data_raw.rename(columns={variable: "value"})
+        # convert timestamp to datetime
+        data_raw['timestamp'] = pd.to_datetime(data_raw['timestamp'])
+        data_raw = data_raw.set_index('timestamp')
+        # a little preprocessing if necessary
+        data_process = data_raw.copy()
+        data_process['value'] = data_process['value'].interpolate(method='linear')
+        data_process['temp'] = data_process['temp'].interpolate(method='linear')
+        # calculate observation per day
+        obs_per_hour = int(np.median(data_process.resample('1h').count()))  # [observation/hour]
+        obs_per_day = int(np.median(data_process.resample('1d').count()))  # [observation/day]
+
+        logger.info('📊 Data processed successfully')
+        return data_process, obs_per_day, obs_per_hour
+    except Exception as e:
+        logger.error(f"🔴 Error processing data: {e}")
+        raise
 
 
 def ensure_dir(dir_path):

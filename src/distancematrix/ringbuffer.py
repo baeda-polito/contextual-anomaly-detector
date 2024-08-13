@@ -1,3 +1,7 @@
+#  Copyright © Roberto Chiosa 2024.
+#  Email: roberto.chiosa@polito.it
+#  Last edited: 16/7/2024
+
 import numpy as np
 from math import ceil
 
@@ -73,7 +77,7 @@ class RingBuffer(object):
         # If the view does not has its target capacity, first fill until it does
         if self._view_length < self._view_max_length:
             delta = min(data_len, self._view_max_length - self._view_length)
-            self._buffer[..., self._view_length: self._view_length+delta] = data[..., :delta]
+            self._buffer[..., self._view_length: self._view_length + delta] = data[..., :delta]
             self._view_length += delta
             self.view = self._buffer[..., :self._view_length]
 
@@ -97,7 +101,7 @@ class RingBuffer(object):
         elif data_len < self._view_max_length:
             mem_len = self._view_max_length - data_len
             self._buffer[..., :mem_len] = \
-                self._buffer[..., self._view_start+data_len:self._view_start+self._view_max_length]
+                self._buffer[..., self._view_start + data_len:self._view_start + self._view_max_length]
             self._buffer[..., mem_len:self._view_max_length] = data
             self._view_start = 0
             self.view = self._buffer[..., self._view_start:self._view_start + self._view_max_length]

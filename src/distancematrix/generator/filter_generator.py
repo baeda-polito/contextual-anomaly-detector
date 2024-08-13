@@ -1,10 +1,14 @@
+#  Copyright © Roberto Chiosa 2024.
+#  Email: roberto.chiosa@polito.it
+#  Last edited: 16/7/2024
+
 import numpy as np
 
-from distancematrix.util import sliding_window_view
-from distancematrix.ringbuffer import RingBuffer
-from distancematrix.generator.abstract_generator import AbstractGenerator
-from distancematrix.generator.abstract_generator import AbstractBoundGenerator
-from distancematrix.generator.abstract_generator import AbstractBoundStreamingGenerator
+from src.distancematrix.generator.abstract_generator import AbstractBoundGenerator
+from src.distancematrix.generator.abstract_generator import AbstractBoundStreamingGenerator
+from src.distancematrix.generator.abstract_generator import AbstractGenerator
+from src.distancematrix.ringbuffer import RingBuffer
+from src.distancematrix.util import sliding_window_view
 
 
 def is_not_finite(data, subseq_length):
@@ -98,25 +102,25 @@ class BoundFilterGenerator(AbstractBoundGenerator):
 
         if diag >= 0:
             if self.invalid_series_subseq is not None:
-                distances[self.invalid_series_subseq[diag: diag+len(distances)]] = np.Inf
+                distances[self.invalid_series_subseq[diag: diag + len(distances)]] = np.inf
             if self.invalid_query_subseq is not None:
-                distances[self.invalid_query_subseq[:len(distances)]] = np.Inf
+                distances[self.invalid_query_subseq[:len(distances)]] = np.inf
         else:
             if self.invalid_series_subseq is not None:
-                distances[self.invalid_series_subseq[:len(distances)]] = np.Inf
+                distances[self.invalid_series_subseq[:len(distances)]] = np.inf
             if self.invalid_query_subseq is not None:
-                distances[self.invalid_query_subseq[-diag: -diag+len(distances)]] = np.Inf
+                distances[self.invalid_query_subseq[-diag: -diag + len(distances)]] = np.inf
 
         return distances
 
     def calc_column(self, column):
         if self.invalid_series_subseq is not None and self.invalid_series_subseq[column]:
-            return np.full(self.num_q_subseq, np.Inf)
+            return np.full(self.num_q_subseq, np.inf)
 
         distances = self.generator.calc_column(column)
 
         if self.invalid_query_subseq is not None:
-            distances[self.invalid_query_subseq] = np.Inf
+            distances[self.invalid_query_subseq] = np.inf
 
         return distances
 
@@ -196,10 +200,10 @@ class BoundStreamingFilterGenerator(BoundFilterGenerator, AbstractBoundStreaming
 
     def calc_column(self, column):
         if self.invalid_series_subseq[column]:
-            return np.full(len(self.invalid_query_subseq.view), np.Inf)
+            return np.full(len(self.invalid_query_subseq.view), np.inf)
 
         distances = self.generator.calc_column(column)
-        distances[self.invalid_query_subseq.view] = np.Inf
+        distances[self.invalid_query_subseq.view] = np.inf
 
         return distances
 
@@ -235,7 +239,6 @@ def _correct_data_and_create_masks(data, m, invalid_data_function):
     if invalid_data.shape != data.shape:
         raise RuntimeError("Invalid_data_function's output does not have expected dimension.")
 
-
     # invalid_data = invalid_data and np.any(invalid_data)
     # invalid_subseq = invalid_subseq and np.any(invalid_subseq)
 
@@ -247,6 +250,7 @@ def _correct_data_and_create_masks(data, m, invalid_data_function):
         invalid_mask = _invalid_data_to_invalid_subseq(invalid_data, m)
 
     return new_data, invalid_mask
+
 
 def _invalid_data_to_invalid_subseq(invalid_data, subseq_length):
     """
@@ -267,7 +271,7 @@ def _invalid_data_to_invalid_subseq(invalid_data, subseq_length):
         if impacted:
             impacted -= 1
 
-    for i in range(subseq_length-1, data_length):
+    for i in range(subseq_length - 1, data_length):
         if invalid_data[i]:
             impacted = subseq_length
         if impacted:

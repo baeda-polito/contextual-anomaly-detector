@@ -1,3 +1,7 @@
+#  Copyright © Roberto Chiosa 2024.
+#  Email: roberto.chiosa@polito.it
+#  Last edited: 16/7/2024
+
 import signal
 from contextlib import contextmanager
 
@@ -33,6 +37,7 @@ def interrupt_catcher():
 
 if __name__ == "__main__":
     import time
+
     for i in range(5):
         print(i)
         time.sleep(1)

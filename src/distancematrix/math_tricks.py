@@ -1,6 +1,11 @@
+#  Copyright © Roberto Chiosa 2024.
+#  Email: roberto.chiosa@polito.it
+#  Last edited: 16/7/2024
+
 import numpy as np
-from distancematrix.ringbuffer import RingBuffer
-from distancematrix.util import sliding_window_view
+
+from src.distancematrix.ringbuffer import RingBuffer
+from src.distancematrix.util import sliding_window_view
 
 
 def sliding_mean_std(series, m):

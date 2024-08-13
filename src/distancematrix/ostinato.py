@@ -1,12 +1,17 @@
+#  Copyright © Roberto Chiosa 2024.
+#  Email: roberto.chiosa@polito.it
+#  Last edited: 16/7/2024
+
 from collections import namedtuple
+
 import numpy as np
 
-from distancematrix import AnytimeCalculator
-from distancematrix.generator import ZNormEuclidean
-from distancematrix.generator.znorm_euclidean import BoundZNormEuclidean
-from distancematrix.consumer import MatrixProfileLR
-from distancematrix.math_tricks import sliding_mean_std
-from distancematrix.ringbuffer import RingBuffer
+from src.distancematrix import AnytimeCalculator
+from src.distancematrix.consumer import MatrixProfileLR
+from src.distancematrix.generator import ZNormEuclidean
+from src.distancematrix.generator.znorm_euclidean import BoundZNormEuclidean
+from src.distancematrix.math_tricks import sliding_mean_std
+from src.distancematrix.ringbuffer import RingBuffer
 
 CMResult = namedtuple('CMResult', ['radius', 'series_index', 'subseq_index'])
 

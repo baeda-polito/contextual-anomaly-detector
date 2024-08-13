@@ -1,49 +1,29 @@
-[build-system]
-requires = ["setuptools>=61.0"]
-build-backend = "setuptools.build_meta"
-
-[project]
+[tool.poetry]
 name = "cmp"
-dynamic = ["version"]
-description = "Sample Python Project for creating a new Python Module"
+version = "0.1.1"
+description = ""
+authors = ["RobertoChiosa <roberto.chiosa@gmail.com>"]
 readme = "README.md"
-license = { file = "LICENSE" }
-keywords = ["data"]
-authors = [
-    { name = "Roberto Chiosa", email = "roberto.chiosa@polito.it" },
-]
-maintainers = [
-    { name = "Roberto Chiosa", email = "roberto.chiosa@polito.it" },
-]
-classifiers = [
-    # How mature is this project? Common values are
-    #   3 - Alpha
-    #   4 - Beta
-    #   5 - Production/Stable
-    "Development Status :: 4 - Alpha",
-    # Indicate who your project is intended for
-    "Intended Audience :: Developers",
-    "Topic :: Software Development :: Build Tools",
-    # Pick your license as you wish (see also "license" above)
-    "License :: OSI Approved :: MIT License",
-    # Specify the Python versions you support here.
-    "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.12",
-]
-requires-python = ">=3.8.1"
-dependencies = [
-    "pandas",
-    "seaborn",
-    "kneed"
+packages = [
+    { include = "src/cmp" },
+    { include = "src/distancematrix" },
 ]
 
-[project.urls]
-Homepage = "https://github.com/baeda-polito/matrix-profile/tree/main"
-Documentation = "https://github.com/baeda-polito/matrix-profile/tree/main/README.md"
-Repository = "https://github.com/baeda-polito/matrix-profile/tree/main.git"
-Issues = "https://github.com/baeda-polito/matrix-profile/tree/main/issues"
-Changelog = "https://github.com/baeda-polito/matrix-profile/tree/main/CHANGELOG.md"
+[tool.poetry.dependencies]
+python = "^3.11"
+numpy = "^2.0.0"
+pandas = "^2.2.2"
+plotly = "^5.22.0"
+scipy = "^1.14.0"
+matplotlib = "^3.9.1"
+seaborn = "^0.13.2"
+kneed = "^0.8.5"
+jinja2 = "^3.1.4"
+argparse = "^1.4.0"
+logger = "^1.4"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+

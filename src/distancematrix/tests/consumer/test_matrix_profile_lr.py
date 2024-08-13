@@ -1,13 +1,18 @@
-import numpy as np
-from numpy import nan
-from unittest import TestCase
-import numpy.testing as npt
+#  Copyright © Roberto Chiosa 2024.
+#  Email: roberto.chiosa@polito.it
+#  Last edited: 16/7/2024
 
-from distancematrix.util import diag_indices_of
-from distancematrix.util import diag_indices
-from distancematrix.consumer.matrix_profile_lr import MatrixProfileLR
-from distancematrix.consumer.matrix_profile_lr import ShiftingMatrixProfileLR
-from distancematrix.consumer.matrix_profile_lr import MatrixProfileLRReservoir
+from unittest import TestCase
+
+import numpy as np
+import numpy.testing as npt
+from numpy import nan
+
+from src.distancematrix.consumer.matrix_profile_lr import MatrixProfileLR
+from src.distancematrix.consumer.matrix_profile_lr import MatrixProfileLRReservoir
+from src.distancematrix.consumer.matrix_profile_lr import ShiftingMatrixProfileLR
+from src.distancematrix.util import diag_indices
+from src.distancematrix.util import diag_indices_of
 
 
 def brute_force_mp(dist_matrix):
@@ -54,7 +59,7 @@ class TestMatrixProfileLR(TestCase):
             self.mplr.process_diagonal(diag, np.atleast_2d(self.dm[diag_ind]))
 
         rmp, rmpi = brute_force_mp(fill_diagonals(self.dm, range(0, self.dm.shape[1]), np.inf))
-        lmp, lmpi = brute_force_mp(fill_diagonals(self.dm, range(-self.dm.shape[1]+1, 0), np.inf))
+        lmp, lmpi = brute_force_mp(fill_diagonals(self.dm, range(-self.dm.shape[1] + 1, 0), np.inf))
         mp, mpi = brute_force_mp(self.dm)
 
         npt.assert_allclose(self.mplr.matrix_profile_right, rmp)
@@ -226,10 +231,10 @@ class TestShiftingMatrixProfileLR(TestMatrixProfileLR):
 
     def test_calculate_columns_with_series_and_query_shifting(self):
         dm = np.array([
-            [2.,  2.,  3.,  1.,  nan, nan],
-            [4.,  1.,  2.,  4.,  nan, nan],
-            [1.,  3.,  4.,  2.,  -1., -5.],
-            [3.,  4.,  1.,  3.,  -2., -6.],
+            [2., 2., 3., 1., nan, nan],
+            [4., 1., 2., 4., nan, nan],
+            [1., 3., 4., 2., -1., -5.],
+            [3., 4., 1., 3., -2., -6.],
             [nan, nan, nan, 8., -3., -7.],
             [nan, nan, nan, 7., -4., 0.]
         ])
@@ -369,10 +374,10 @@ class TestShiftingMatrixProfileLR(TestMatrixProfileLR):
 
     def test_calculate_diagonals_with_series_and_query_shifting(self):
         dm = np.array([
-            [2.,  2.,  3.,  1.,  nan, nan],
-            [4.,  1.,  2.,  4.,  nan, nan],
-            [1.,  3.,  4.,  2.,  -1., -5.],
-            [3.,  4.,  1.,  3.,  -2., -6.],
+            [2., 2., 3., 1., nan, nan],
+            [4., 1., 2., 4., nan, nan],
+            [1., 3., 4., 2., -1., -5.],
+            [3., 4., 1., 3., -2., -6.],
             [nan, nan, nan, -1., -3., -7.],
             [nan, nan, nan, nan, -4., 0.]
         ])

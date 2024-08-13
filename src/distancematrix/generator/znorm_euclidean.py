@@ -1,11 +1,15 @@
+#  Copyright © Roberto Chiosa 2024.
+#  Email: roberto.chiosa@polito.it
+#  Last edited: 16/7/2024
+
 import numpy as np
 from scipy.signal import fftconvolve
 
-from distancematrix.util import diag_length
-from distancematrix.math_tricks import sliding_mean_std
-from distancematrix.generator.abstract_generator import AbstractGenerator
-from distancematrix.generator.abstract_generator import AbstractBoundStreamingGenerator
-from distancematrix.ringbuffer import RingBuffer
+from src.distancematrix.generator.abstract_generator import AbstractBoundStreamingGenerator
+from src.distancematrix.generator.abstract_generator import AbstractGenerator
+from src.distancematrix.math_tricks import sliding_mean_std
+from src.distancematrix.ringbuffer import RingBuffer
+from src.distancematrix.util import diag_length
 
 _EPS = 1e-12
 

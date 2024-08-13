@@ -1,4 +1,6 @@
-import os
+#  Copyright © Roberto Chiosa 2024.
+#  Email: roberto.chiosa@polito.it
+#  Last edited: 16/7/2024
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -87,7 +89,7 @@ def zscore_fun(group, vector_ad, upper_bound=2):
 
     fig, ax = plt.subplots()
     sns.kdeplot(data=zscore)
-    plt.axvline(x=upper_bound, ymin=0, ymax=1, linestyle='dashed', color='gray')
+    plt.axvline(x=upper_bound, linestyle='dashed', color='gray')
     plt.close(fig)
     # create an array of medians according cluster on yearly period
     outliers = np.zeros(group.size)
@@ -256,7 +258,7 @@ def gesd_fun(group, vector_ad):
     """
 
     fig, ax = plt.subplots()
-    stats.probplot(vector_ad, dist="norm", plot=plt)
+    stats.probplot(vector_ad, plot=plt)
     plt.close(fig)
 
     n_outliers = gesd_esd_test(input_series=vector_ad, alpha=0.05, max_outliers=10)
@@ -425,5 +427,3 @@ def anomaly_detection(group, vector_ad):
     ad_score = np.asarray(df['severity'])
 
     return ad_score
-
-

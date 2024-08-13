@@ -1,10 +1,14 @@
+#  Copyright © Roberto Chiosa 2024.
+#  Email: roberto.chiosa@polito.it
+#  Last edited: 16/7/2024
+
 import numpy as np
 
-from distancematrix.util import diag_length
-from distancematrix.util import sliding_window_view
-from distancematrix.ringbuffer import RingBuffer
-from distancematrix.generator.abstract_generator import AbstractGenerator
-from distancematrix.generator.abstract_generator import AbstractBoundStreamingGenerator
+from src.distancematrix.generator.abstract_generator import AbstractBoundStreamingGenerator
+from src.distancematrix.generator.abstract_generator import AbstractGenerator
+from src.distancematrix.ringbuffer import RingBuffer
+from src.distancematrix.util import diag_length
+from src.distancematrix.util import sliding_window_view
 
 EPSILON = 1e-15
 

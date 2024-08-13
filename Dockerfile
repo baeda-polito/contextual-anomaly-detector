@@ -15,7 +15,10 @@ ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
 WORKDIR /app
-
+# todo pass the csv as arcument in the cli and write documentation and add to catalog in moderate platform
+# todo static s3 report to s3 http url and dataset to download and run
+# todo dataset csv process the report data validation inide the success 200, output path as url
+# todo if faul caputure console raise exception place the htmp lo caricano gli altri su s3
 # Create a non-privileged user that the app will run under.
 # See https://docs.docker.com/go/dockerfile-user-best-practices/
 ARG UID=10001

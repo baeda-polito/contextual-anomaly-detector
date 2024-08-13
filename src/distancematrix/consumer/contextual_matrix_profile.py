@@ -1,8 +1,12 @@
+#  Copyright © Roberto Chiosa 2024.
+#  Email: roberto.chiosa@polito.it
+#  Last edited: 16/7/2024
+
 import numpy as np
 
-from distancematrix.ringbuffer import RingBuffer
-from distancematrix.consumer.abstract_consumer import AbstractStreamingConsumer
-from distancematrix.consumer.contextmanager import AbstractContextManager
+from src.distancematrix.consumer.abstract_consumer import AbstractStreamingConsumer
+from src.distancematrix.consumer.contextmanager import AbstractContextManager
+from src.distancematrix.ringbuffer import RingBuffer
 
 
 class ContextualMatrixProfile(AbstractStreamingConsumer):
@@ -47,7 +51,7 @@ class ContextualMatrixProfile(AbstractStreamingConsumer):
 
         num_query_contexts, num_series_contexts = self._contexts.context_matrix_shape()
 
-        self._distance_matrix = RingBuffer(np.full((num_query_contexts, num_series_contexts), np.Inf, dtype=float),
+        self._distance_matrix = RingBuffer(np.full((num_query_contexts, num_series_contexts), np.inf, dtype=float),
                                            scaling_factor=self._rb_scale_factor)
         self._match_index_series = RingBuffer(np.full((num_query_contexts, num_series_contexts), -1, dtype=int),
                                               scaling_factor=self._rb_scale_factor)
@@ -119,7 +123,7 @@ class ContextualMatrixProfile(AbstractStreamingConsumer):
 
         if context_shift > 0:
             height = self._distance_matrix.max_shape[0]
-            self._distance_matrix.push(np.full((height, context_shift), np.Inf, dtype=float))
+            self._distance_matrix.push(np.full((height, context_shift), np.inf, dtype=float))
             self._match_index_series.push(np.full((height, context_shift), -1, dtype=int))
             self._match_index_query.push(np.full((height, context_shift), -1, dtype=int))
 
@@ -131,7 +135,7 @@ class ContextualMatrixProfile(AbstractStreamingConsumer):
             # Note: This could be more efficient using a 2D Ringbuffer.
             height = min(context_shift, self._distance_matrix.max_shape[0])
             self._distance_matrix.view = np.roll(self._distance_matrix.view, context_shift, axis=0)
-            self._distance_matrix[-height:, :] = np.Inf
+            self._distance_matrix[-height:, :] = np.inf
             self._match_index_series.view = np.roll(self._match_index_series.view, context_shift, axis=0)
             self._match_index_series[-height:, :] = -1
             self._match_index_query.view = np.roll(self._match_index_query.view, context_shift, axis=0)

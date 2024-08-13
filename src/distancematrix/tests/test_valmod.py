@@ -1,19 +1,24 @@
+#  Copyright © Roberto Chiosa 2024.
+#  Email: roberto.chiosa@polito.it
+#  Last edited: 16/7/2024
+
 import unittest
+from unittest import TestCase
 
 import numpy as np
-from unittest import TestCase
 import numpy.testing as npt
 
-from distancematrix.valmod import _find_all_motifs_full_matrix_iteration
-from distancematrix.valmod import LowerBoundEntry
-from distancematrix.generator.znorm_euclidean import ZNormEuclidean
+from src.distancematrix.generator.znorm_euclidean import ZNormEuclidean
+from src.distancematrix.valmod import LowerBoundEntry
+from src.distancematrix.valmod import _find_all_motifs_full_matrix_iteration
 
 
 class TestValmod(TestCase):
     def _test_find_all_motifs_full_matrix_iteration(self, data, m, lb_list_size):
         dist_gen = ZNormEuclidean(0.).prepare(m, data)
 
-        calc_lb_lists, calc_motif_idxs = _find_all_motifs_full_matrix_iteration(dist_gen, lb_list_size, int(np.ceil(m / 2)))
+        calc_lb_lists, calc_motif_idxs = _find_all_motifs_full_matrix_iteration(dist_gen, lb_list_size,
+                                                                                int(np.ceil(m / 2)))
         bf_lb_lists, bf_motif_idxs = bruteforce_full_matrix_iteration(data, m, lb_list_size)
 
         npt.assert_equal(set(bf_motif_idxs), set(calc_motif_idxs))
@@ -43,7 +48,7 @@ class TestValmod(TestCase):
                 [(e.q_index, e.s_index) for e in calc_lb_list[:lists_match_upto]])
 
             for entry in calc_lb_list[lists_match_upto:]:
-                subseq_1 = data[entry.q_index: entry.q_index + m ]
+                subseq_1 = data[entry.q_index: entry.q_index + m]
                 subseq_2 = data[entry.s_index: entry.s_index + m]
                 npt.assert_almost_equal(np.sum(subseq_1 * subseq_2), entry.dot_prod)
 

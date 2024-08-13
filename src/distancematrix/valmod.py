@@ -1,6 +1,10 @@
+#  Copyright © Roberto Chiosa 2024.
+#  Email: roberto.chiosa@polito.it
+#  Last edited: 16/7/2024
+
 import numpy as np
-from distancematrix.generator.znorm_euclidean import ZNormEuclidean
-import time
+
+from src.distancematrix.generator.znorm_euclidean import ZNormEuclidean
 
 
 def find_variable_length_motifs(series, min_motif_length, max_motif_length, cache_size=3, noise_std=0.):
@@ -141,7 +145,7 @@ def _find_all_motifs_full_matrix_iteration(dist_generator, lb_list_size, trivial
     subseq_length = dist_generator.m
 
     lb_lists = []
-    best_motif_dist = np.Inf
+    best_motif_dist = np.inf
     best_motif_idxs = None
 
     for column_idx in range(num_subseq):

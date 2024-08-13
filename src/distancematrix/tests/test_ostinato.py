@@ -1,13 +1,17 @@
+#  Copyright © Roberto Chiosa 2024.
+#  Email: roberto.chiosa@polito.it
+#  Last edited: 16/7/2024
+
 from itertools import permutations
 from unittest import TestCase
 
 import numpy as np
 import numpy.testing as npt
 
-from distancematrix.generator import ZNormEuclidean
-from distancematrix.consumer import MatrixProfileLR
-from distancematrix.calculator import AnytimeCalculator
-from distancematrix.ostinato import find_consensus_motif, CMResult
+from src.distancematrix.calculator import AnytimeCalculator
+from src.distancematrix.consumer import MatrixProfileLR
+from src.distancematrix.generator import ZNormEuclidean
+from src.distancematrix.ostinato import find_consensus_motif, CMResult
 
 
 class TestOstinato(TestCase):
@@ -100,7 +104,3 @@ def find_consensus_motif_bruteforce(series_list, m) -> CMResult:
             result = CMResult(subseq_radius, series_idx, subseq_idx)
 
     return result
-
-
-
-
