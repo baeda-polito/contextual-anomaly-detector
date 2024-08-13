@@ -22,7 +22,7 @@ clustering etc.
 
 The tool comes with a cli that helps you to execute the script with the desired commands
 
-```bash 
+```console 
 $ python -m src.cmp.main -h
 
 Matrix profile
@@ -78,10 +78,10 @@ Create virtual environment and activate it and install dependencies:
   ```
 
 Now you can run the script from the console by passing the desired arguments. In the following we pass the sample
-dataset [data.csv](src/cmp/data/data.csv) as input file and the variable `Total_Power` as the variable name to be used
+dataset [`data.csv`](src/cmp/data/data.csv) as input file and the variable `Total_Power` as the variable name to be used
 for the analysis. The output file will be saved in the [`results`](src/cmp/results) folder.
 
-```bash
+```console
 $ python -m src.cmp.main src/cmp/data/data.csv Total_Power src/cmp/results/reports/report.html
 
 2024-08-13 12:45:42,821 [INFO](src.cmp.utils) ⬇️ Downloading file from <src/cmp/data/data.csv>
