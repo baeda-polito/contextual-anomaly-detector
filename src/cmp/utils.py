@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
 import numpy as np
 import pandas as pd
+import requests
 from jinja2 import Environment, FileSystemLoader
 
 # Path to folders
@@ -71,8 +72,14 @@ def download_data(filepath: str) -> pd.DataFrame:
     :param filepath:
     :return: data
     """
-    logger.info(f"⬇️ Downloading file from <{filepath}>")
-    data = pd.read_csv(filepath)
+    # if filepath is an url request otherwise read from file
+    if filepath.startswith('http'):
+        logger.info(f"⬇️ Downloading file from online url <{filepath}>")
+        res = requests.get(filepath)
+        data = pd.read_csv(res.text)
+    else:
+        logger.info(f"⬇️ Reading local file from <{filepath}> path")
+        data = pd.read_csv(filepath)
     return data
 
 
