@@ -4,9 +4,9 @@
 define find.functions
 	@fgrep -h "##" $(MAKEFILE_LIST) | fgrep -v fgrep | sed -e 's/\\$$//' | sed -e 's/##//'
 endef
-
-VENV := source .venv/bin/activate
-
+VENV = .venv
+PYTHON = $(VENV)/bin/python3
+PIP = $(VENV)/bin/pip
 
 help:
 	@echo 'The following commands can be used.'
@@ -30,4 +30,27 @@ docker-build:
 
 docker-run: ## Build docker image
 docker-run:
-	docker run cmp
+	docker run cmp data/data.csv Total_Power results/reports/report.html
+
+
+
+
+.PHONY: rm-git-cache
+rm-git-cache:
+	@echo "Removing git cached files"
+	git add .
+	git rm -r --cached .
+	git add .
+
+.PHONY: setup
+setup:
+	@if [ ! -d "${VENV}" ]; then \
+		echo "Creating venv"; \
+		python3 -m venv ${VENV}; \
+	fi
+	echo "Venv already exists"; \
+	source ${VENV}/bin/activate; \
+	pip install --upgrade pip; \
+	pip install poetry; \
+	poetry config virtualenvs.create false; \
+	poetry install;
