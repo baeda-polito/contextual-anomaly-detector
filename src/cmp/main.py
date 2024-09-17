@@ -1,24 +1,17 @@
 #  Copyright © Roberto Chiosa 2024.
 #  Email: roberto.chiosa@polito.it
-#  Last edited: 13/8/2024
+#  Last edited: 17/9/2024
+
 import argparse
-# import from default libraries and packages
 import datetime  # data
 from statistics import mean
 
-# import matplotlib.pyplot as  plt  # plots
 import plotly.express as px
-# import scipy.stats as stats
 from scipy.stats import zscore
-
 from src.cmp.anomaly_detection_functions import anomaly_detection, extract_vector_ad_temperature, \
     extract_vector_ad_energy, extract_vector_ad_cmp
-# from src.distancematrix.generator import Euclidean
-# import from custom modules useful functions
 from src.cmp.utils import *
-# import from the local module distancematrix
 from src.distancematrix.calculator import AnytimeCalculator
-# from src.distancematrix.consumer import ContextualMatrixProfile
 from src.distancematrix.consumer.contextmanager import GeneralStaticManager
 from src.distancematrix.consumer.contextual_matrix_profile import ContextualMatrixProfile
 from src.distancematrix.generator.euclidean import Euclidean
@@ -88,11 +81,12 @@ if __name__ == '__main__':
 
     # The number of time window has been selected from CART on total electrical power,
     # results are contained in 'time_window.csv' file
+    # todo perform cart and create dataframe accordingly
     df_time_window = pd.read_csv(os.path.join(path_to_data, "time_window_corrected.csv"))
 
     # The context is defined as 1 hour before time window, to be consistent with other analysis,
     # results are loaded from 'm_context.csv' file
-    m_context = pd.read_csv(os.path.join(path_to_data, "m_context.csv"))["m_context"][0]
+    m_context = 1
 
     # Define output files as dataframe
     # - df_anomaly_results -> in this file the anomaly results will be saved
@@ -119,11 +113,13 @@ if __name__ == '__main__':
             context_start = context_end - m_context  # [hours]
 
         # print string to explain the created context in an intelligible way
-        context_string = f'Subsequences of {dec_to_hour(m / obs_per_hour)} h (m = {m}) that start in [{dec_to_hour(context_start)},{dec_to_hour(context_end)})'
+        context_string = (f'Subsequences of {dec_to_hour(m / obs_per_hour)} h (m = {m}) that '
+                          f'start in [{dec_to_hour(context_start)},{dec_to_hour(context_end)})')
 
         # contracted context string for names
-        context_string_small = f'ctx_from{dec_to_hour(context_start)}_to{dec_to_hour(context_end)}_m{dec_to_hour(m / obs_per_hour)}'.replace(
-            ":", "_")
+        context_string_small = (f'ctx_from{dec_to_hour(context_start)}_'
+                                f'to{dec_to_hour(context_end)}_m{dec_to_hour(m / obs_per_hour)}'
+                                ).replace(":", "_")
 
         # update context dataframe
         df_contexts.loc[id_tw] = [
@@ -208,6 +204,7 @@ if __name__ == '__main__':
         })
 
         ########################################################################################
+        # todo perform cluster analysis
         # Load Cluster results as boolean dataframe: each column represents a group
         group_df = pd.read_csv(os.path.join(path_to_data, "group_cluster.csv"), index_col='timestamp', parse_dates=True)
         # initialize dataframe of results for context to be appended to the overall result
@@ -322,7 +319,12 @@ if __name__ == '__main__':
 
             report_content['contexts'][id_tw]["clusters"].append({
                 "title": f"Cluster {id_cluster + 1}",
-                "content": f"The current cluster contains {len(group_dates)} days and {num_anomalies_to_show} anomalies identified in the context defines as {context_string.lower()}. The plot referring to the cluster and relative anomaly (if any) are reported in the line-plot below. The red line refers to the anomalous day, while the light orange box refers to the time window {id_tw + 1} and the dark orange the context under analysis.",
+                "content": f"The current cluster contains {len(group_dates)} days and "
+                           f"{num_anomalies_to_show} anomalies "
+                           f"identified in the context defines as {context_string.lower()}. The plot referring to the "
+                           f"cluster and relative anomaly (if any) are reported in the line-plot below. The red line "
+                           f"refers to the anomalous day, while the light orange box refers to the time "
+                           f"window {id_tw + 1} and the dark orange the context under analysis.",
                 "plot": fig.to_html(full_html=False),
                 "table": anomalies_table.to_html(index=False,
                                                  classes='table table-striped table-hover',

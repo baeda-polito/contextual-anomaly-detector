@@ -112,3 +112,6 @@ GitHub.sublime-settings
 .DS_Store
 !data.csv
 !example.png
+!cmp.html
+!time_window_corrected.csv
+!group_cluster.csv

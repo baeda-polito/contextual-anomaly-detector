@@ -36,6 +36,7 @@ docker-run:
 
 
 .PHONY: rm-git-cache
+rm-git-cache: ## Remove git cached files
 rm-git-cache:
 	@echo "Removing git cached files"
 	git add .
@@ -43,6 +44,7 @@ rm-git-cache:
 	git add .
 
 .PHONY: setup
+setup: ## Setup the project
 setup:
 	@if [ ! -d "${VENV}" ]; then \
 		echo "Creating venv"; \
