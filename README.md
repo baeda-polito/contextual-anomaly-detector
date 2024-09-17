@@ -1,9 +1,13 @@
 # Contextual Matrix Profile Calculation Tool
 
-The Matrix Profile has the potential to revolutionize time series data mining because of its generality, versatility,
-simplicity and scalability. In particular it has implications for time series motif discovery, time series joins,
-shapelet discovery (classification), density estimation, semantic segmentation, visualization, rule discovery,
-clustering etc.
+Matrix Profile is an algorithm capable to discover motifs and discords in time series data. It is a powerful tool that
+by calculating the (z-normalized) Euclidean distance between any subsequence within a time series and its nearest
+neighbor it is able to provide insights on potential anomalies and/or repetitive patterns. In the field of building
+energy management it can be employed to detect anomalies in electrical load timeseries.
+
+This tool is a Python implementation of the Matrix Profile algorithm that employs contextual information (such as
+external air temperature) to identify abnormal pattens in electrical load subsequences that start in predefined sub
+daily time windows, as shown in the following figure.
 
 ![](./docs/example.png)
 
@@ -20,7 +24,7 @@ clustering etc.
 
 ## Usage
 
-The tool comes with a cli that helps you to execute the script with the desired commands
+The tool comes with a CLI that helps you to execute the script with the desired commands
 
 ```console 
 $ python -m src.cmp.main -h
@@ -39,7 +43,7 @@ options:
 The arguments to pass to the script are the following:
 
 * `input_file`: The input dataset via an HTTP URL. The tool should then download the dataset from that URL; since it's a
-  presigned URL, the tool would not need to deal with authentication—it can just download the dataset directly.
+  pre-signed URL, the tool would not need to deal with authentication—it can just download the dataset directly.
 * `variable_name`: The variable name to be used for the analysis (i.e., the column of the csv that contains the
   electrical load under analysis).
 * `output_file`: The local path to the output HTML report. The platform would then get that HTML report and upload it to
@@ -47,7 +51,8 @@ The arguments to pass to the script are the following:
   storage service for the user to review later.
 
 You can run the main script through the console using either local files or download data from an external url. This
-repository comes with a sample dataset (data.csv) that you can use to generate a report and you can pass the local path
+repository comes with a sample dataset ([data.csv](.src/cmp/data/data.csv)) that you can use to generate a report and
+you can pass the local path
 as `input_file` argument as follows:
 
 ### Data format

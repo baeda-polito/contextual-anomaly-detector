@@ -1,6 +1,6 @@
 #  Copyright © Roberto Chiosa 2024.
 #  Email: roberto.chiosa@polito.it
-#  Last edited: 13/8/2024
+#  Last edited: 17/9/2024
 
 import argparse
 import datetime  # data
@@ -8,7 +8,6 @@ from statistics import mean
 
 import plotly.express as px
 from scipy.stats import zscore
-
 from src.cmp.anomaly_detection_functions import anomaly_detection, extract_vector_ad_temperature, \
     extract_vector_ad_energy, extract_vector_ad_cmp
 from src.cmp.utils import *
@@ -82,11 +81,12 @@ if __name__ == '__main__':
 
     # The number of time window has been selected from CART on total electrical power,
     # results are contained in 'time_window.csv' file
+    # todo perform cart and create dataframe accordingly
     df_time_window = pd.read_csv(os.path.join(path_to_data, "time_window_corrected.csv"))
 
     # The context is defined as 1 hour before time window, to be consistent with other analysis,
     # results are loaded from 'm_context.csv' file
-    m_context = pd.read_csv(os.path.join(path_to_data, "m_context.csv"))["m_context"][0]
+    m_context = 1
 
     # Define output files as dataframe
     # - df_anomaly_results -> in this file the anomaly results will be saved
@@ -204,6 +204,7 @@ if __name__ == '__main__':
         })
 
         ########################################################################################
+        # todo perform cluster analysis
         # Load Cluster results as boolean dataframe: each column represents a group
         group_df = pd.read_csv(os.path.join(path_to_data, "group_cluster.csv"), index_col='timestamp', parse_dates=True)
         # initialize dataframe of results for context to be appended to the overall result
