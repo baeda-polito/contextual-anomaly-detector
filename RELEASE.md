@@ -1,3 +1,5 @@
 ### Features:
 
-- Added command line interface for the tool
+- Fixed csv path issues
+- Documentation updates
+- Docker run support
