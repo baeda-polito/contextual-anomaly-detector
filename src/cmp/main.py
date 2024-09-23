@@ -1,6 +1,6 @@
 #  Copyright © Roberto Chiosa 2024.
 #  Email: roberto.chiosa@polito.it
-#  Last edited: 17/9/2024
+#  Last edited: 23/9/2024
 
 import argparse
 import datetime  # data
@@ -8,6 +8,7 @@ from statistics import mean
 
 import plotly.express as px
 from scipy.stats import zscore
+
 from src.cmp.anomaly_detection_functions import anomaly_detection, extract_vector_ad_temperature, \
     extract_vector_ad_energy, extract_vector_ad_cmp
 from src.cmp.utils import *
@@ -53,29 +54,6 @@ if __name__ == '__main__':
     raw_data = download_data(args.input_file)
     data, obs_per_day, obs_per_hour = process_data(raw_data, args.variable_name)
 
-    # print dataset main characteristics
-    summary = f''' \n*********************\n
-              DATASET: Electrical Load dataset from {args.variable_name}\n
-              - From\t{data.index[0]}\n
-              - To\t{data.index[len(data) - 1]}\n
-              - {len(data.index[::obs_per_day])}\tdays\n
-              - 1 \tobservations every 15 min\n
-              - {obs_per_day}\tobservations per day\n
-              - {obs_per_hour}\tobservations per hour\n
-              - {len(data)}observations
-              '''
-
-    # Visualise the data  with plotly line plot
-    fig = px.line(data['value'])
-    fig.update_layout(xaxis_title=None, yaxis_title="Electrical Load [kW]", showlegend=False,
-                      paper_bgcolor='rgba(0,0,0,0)')
-
-    report_content['summary'] = {
-        "title": "Dataset Summary",
-        "content": summary,
-        "plot": fig.to_html(full_html=False)
-    }
-
     ########################################################################################
     # Define configuration for the Contextual Matrix Profile calculation.
 
@@ -88,6 +66,44 @@ if __name__ == '__main__':
     # results are loaded from 'm_context.csv' file
     m_context = 1
 
+    # todo perform cluster analysis
+    # Load Cluster results as boolean dataframe: each column represents a group
+    group_df = pd.read_csv(os.path.join(path_to_data, "group_cluster.csv"), index_col='timestamp', parse_dates=True)
+    # get number of groups/clusters
+    n_group = group_df.shape[1]
+    cluster_summary = (f'The dataset has been clustered into {n_group} groups using K-means algorithm and displayed '
+                       f'in the following image. The clusters group similar daily '
+                       f'load profiles for which the contextual matrix profile calculation will be performed.')
+
+    cluster_data_plot = data.copy()
+    cluster_data_plot.reset_index(inplace=True)
+    cluster_data_plot['date'] = cluster_data_plot['timestamp'].dt.date
+    cluster_data_plot['time'] = cluster_data_plot['timestamp'].dt.time
+    cluster_data_plot['cluster'] = 'no_cluster'
+
+    for cluster_id in range(n_group):
+        dates_plot = group_df.index[group_df[f'Cluster_{cluster_id + 1}'] == True]
+        # convert to string object
+        dates_plot = [date.date() for date in dates_plot]
+        # add info to clsuter column
+        cluster_data_plot = cluster_data_plot.assign(
+            cluster=lambda x: np.where(x['date'].isin(dates_plot), f'Cluster_{cluster_id + 1}', x['cluster'])
+        )
+
+    fig = px.line(cluster_data_plot, x='time', y='value', line_group='date', facet_col='cluster', color='cluster')
+    # use viridis palette
+    fig.update(layout=dict(
+        xaxis_title=None,
+        yaxis_title="Power [kW]",
+        paper_bgcolor='rgba(0,0,0,0)',
+        showlegend=False
+    ))
+    report_content['clusters'] = {
+        "title": "Group definition",
+        "content": cluster_summary,
+        "plot": fig.to_html(full_html=False)
+    }
+
     # Define output files as dataframe
     # - df_anomaly_results -> in this file the anomaly results will be saved
     # - df_contexts -> the name and descriptions of contexts
@@ -95,6 +111,8 @@ if __name__ == '__main__':
     df_contexts = pd.DataFrame(
         columns=["from", "to", "context_string", "context_string_small", "duration", "observations"])
 
+    anomalies_table_overall = pd.DataFrame()
+    
     # begin for loop on the number of time windows
     for id_tw in range(len(df_time_window)):
 
@@ -204,16 +222,11 @@ if __name__ == '__main__':
         })
 
         ########################################################################################
-        # todo perform cluster analysis
-        # Load Cluster results as boolean dataframe: each column represents a group
-        group_df = pd.read_csv(os.path.join(path_to_data, "group_cluster.csv"), index_col='timestamp', parse_dates=True)
         # initialize dataframe of results for context to be appended to the overall result
         df_anomaly_context = group_df.astype(int)
 
         # set labels
         day_labels = data.index[::obs_per_day]
-        # get number of groups
-        n_group = group_df.shape[1]
 
         # perform analysis of context on groups (clusters)
         for id_cluster in range(n_group):
@@ -313,7 +326,7 @@ if __name__ == '__main__':
             anomalies_table["Date"] = cmp_ad_score_dates
             anomalies_table["Anomaly Score"] = cmp_ad_score[cmp_ad_score_index]
             anomalies_table["Rank"] = anomalies_table.index + 1
-
+            anomalies_table_overall = pd.concat([anomalies_table_overall, anomalies_table])
             # the number of anomalies is the number of non nan elements, count
             num_anomalies_to_show = np.count_nonzero(~np.isnan(cmp_ad_score))
 
@@ -420,15 +433,67 @@ if __name__ == '__main__':
             # remove redundant columns
             df_anomaly_results = df_anomaly_results.loc[:, ~df_anomaly_results.columns.duplicated()]
 
+    print('\n*********************\n')
     # at the end of loop on context save dataframe of results
     df_anomaly_results.to_csv(os.path.join(path_to_data, "anomaly_results.csv"))
     df_contexts.to_csv(os.path.join(path_to_data, "contexts.csv"), index=False)
+
+    # print summary with anomalies
+    # print dataset main characteristics
+    summary = f'''The dataset under analysis refers to the variable '<strong>{args.variable_name}</strong>':
+                    <ul>
+                      <li>From: {data.index[0]}</li>
+                      <li>To: {data.index[len(data) - 1]}</li>
+                      <li>{len(data.index[::obs_per_day])} days</li>
+                      <li>1 observation every 15 minutes</li>
+                      <li>{obs_per_day} observations per day</li>
+                      <li>{obs_per_hour} observations per hour</li>
+                      <li>{len(data)} total observations</li>
+                    </ul>
+                The line plot represented in the following image represents the whole dataset. 
+                In gray the days where no anomalies where found while in red are highlighted 
+                the anomalous days, identified by the CMP proceed. Please mind that the identified anomalous days 
+                may be anomalous only in certain sub daily sequences as further described in the analysis that follows.
+                  '''
+
+    # il summary lo si fa alla fine
+    # Visualise the data  with plotly line plot
+    df_summary_plot = data.copy()
+    df_summary_plot.reset_index(inplace=True)
+    df_summary_plot['date'] = df_summary_plot['timestamp'].dt.date
+    df_summary_plot['anomaly_score'] = 0
+
+    # Highlight only anomalous days
+    for anom in anomalies_table_overall.itertuples():
+        # get column that matches the date
+        df_summary_plot['date'] = df_summary_plot['timestamp'].dt.date
+        # convert to string object to compare properly
+        df_summary_plot['date'] = df_summary_plot['date'].astype(str)
+
+        index_anom_plot = list(df_summary_plot[df_summary_plot['date'] == anom[1]].index)
+        # update all index to red
+        df_summary_plot.loc[index_anom_plot, 'anomaly_score'] = anom[2]
+
+    # gray from gray to red with 8 steps
+
+    color_palette = ["#808080", "#A00000", "#C00000", "#E00000", "#FF0000", "#FF2020", "#FF4040", "#FF6060", "#FF8080"]
+
+    df_summary_plot['anomaly_score'] = df_summary_plot['anomaly_score'].astype(int)
+    fig = px.line(df_summary_plot, x='timestamp', y='value', color='anomaly_score',
+                  line_group='date', color_discrete_sequence=color_palette)
+    fig.update_layout(xaxis_title=None, yaxis_title="Electrical Load [kW]", showlegend=False,
+                      paper_bgcolor='rgba(0,0,0,0)')
+
+    report_content['summary'] = {
+        "title": "Dataset Summary",
+        "content": summary,
+        "plot": fig.to_html(full_html=False)
+    }
 
     # print the execution time
     total_time = datetime.datetime.now() - begin_time
     hours, remainder = divmod(total_time.total_seconds(), 3600)
     minutes, seconds = divmod(remainder, 60)
-    print('\n*********************\n')
     logger.info(f"TOTAL {str(int(minutes))} min {str(int(seconds))} s")
 
     save_report(report_content, args.output_file)
