@@ -64,7 +64,7 @@ if __name__ == '__main__':
 
     # The context is defined as 1 hour before time window, to be consistent with other analysis,
     # results are loaded from 'm_context.csv' file
-    m_context = 1
+    m_context = 1 # [h]
 
     # todo perform cluster analysis
     # Load Cluster results as boolean dataframe: each column represents a group
