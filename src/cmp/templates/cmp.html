@@ -26,54 +26,61 @@
             {{ summary.plot }}
         </div>
 
+        <!-- Clusters -->
+        <div class="p-0 mb-4">
+            <h2>{{ clusters.title }}</h2>
+            <p>{{ clusters.content }}</p>
+            {{ clusters.plot }}
+        </div>
+
         <!--  Contexts -->
         {% for context in contexts %}
-        <br>
-        <div class="h-100 p-5 bg-body-tertiary border rounded-3">
-            <div class="row align-items-md-stretch top">
-                <div class="col-md-7 p-5 mb-4">
-                    <h2>{{ context.title }}</h2>
-                    <p class="text-muted">{{ context.subtitle }}</p>
-                    <p>{{ context.content }}</p>
+            <br>
+            <div class="h-100 p-5 bg-body-tertiary border rounded-3">
+                <div class="row align-items-md-stretch top">
+                    <div class="col-md-7 p-5 mb-4">
+                        <h2>{{ context.title }}</h2>
+                        <p class="text-muted">{{ context.subtitle }}</p>
+                        <p>{{ context.content }}</p>
+                    </div>
+                    <div class="col-md-5 p-0 mb-4">
+                        {{ context.plot }}
+                    </div>
                 </div>
-                <div class="col-md-5 p-0 mb-4">
-                    {{ context.plot }}
-                </div>
-            </div>
-            {% for cluster in context.clusters %}
+                {% for cluster in context.clusters %}
 
-            {% if cluster.plot_anomalies %}
-            <div class="row align-items-md-stretch border-top">
-                <div class="col-md-12 pt-5 pb-0 pl-5 pr-5 mb-4 bg-body-tertiary">
-                    <h3>{{ cluster.title }}</h3>
-                    <p>{{ cluster.content }}</p>
-                    {{cluster.table}}
-                </div>
-            </div>
-            <div class="row align-items-md-stretch">
-                <div class="col-md-7 p-0 mb-4">
-                    {{ cluster.plot_anomalies }}
-                </div>
-                <div class="col-md-5 p-0 mb-4">
-                    {{ cluster.plot }}
-                </div>
-            </div>
+                    {% if cluster.plot_anomalies %}
+                        <div class="row align-items-md-stretch border-top">
+                            <div class="col-md-12 pt-5 pb-0 pl-5 pr-5 mb-4 bg-body-tertiary">
+                                <h3>{{ cluster.title }}</h3>
+                                <p>{{ cluster.content }}</p>
+                                {{ cluster.table }}
+                            </div>
+                        </div>
+                        <div class="row align-items-md-stretch">
+                            <div class="col-md-7 p-0 mb-4">
+                                {{ cluster.plot_anomalies }}
+                            </div>
+                            <div class="col-md-5 p-0 mb-4">
+                                {{ cluster.plot }}
+                            </div>
+                        </div>
 
 
-            {% else %}
-            <div class="row align-items-md-stretch border-top">
-                <div class="col-md-7 p-5 mb-4 bg-body-tertiary">
-                    <h3>{{ cluster.title }}</h3>
-                    <p>{{ cluster.content }}</p>
-                </div>
-                <div class="col-md-5 p-0 mb-4">
-                    {{ cluster.plot }}
-                </div>
-            </div>
-            {% endif %}
+                    {% else %}
+                        <div class="row align-items-md-stretch border-top">
+                            <div class="col-md-7 p-5 mb-4 bg-body-tertiary">
+                                <h3>{{ cluster.title }}</h3>
+                                <p>{{ cluster.content }}</p>
+                            </div>
+                            <div class="col-md-5 p-0 mb-4">
+                                {{ cluster.plot }}
+                            </div>
+                        </div>
+                    {% endif %}
 
-            {% endfor %}
-        </div>
+                {% endfor %}
+            </div>
         {% endfor %}
 
 

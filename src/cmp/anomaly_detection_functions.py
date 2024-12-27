@@ -1,6 +1,6 @@
 #  Copyright © Roberto Chiosa 2024.
 #  Email: roberto.chiosa@polito.it
-#  Last edited: 13/8/2024
+#  Last edited: 23/9/2024
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -36,6 +36,7 @@ def boxplot_fun(group, vector_ad):
     ax.set_title('Notched box plot')
     # close
     plt.close(fig)
+    plt.close('all')
 
     # get the outliers
     outliers_both_whisker = [flier.get_ydata() for flier in bp["fliers"]]
@@ -91,6 +92,7 @@ def zscore_fun(group, vector_ad, upper_bound=2):
     sns.kdeplot(data=zscore)
     plt.axvline(x=upper_bound, linestyle='dashed', color='gray')
     plt.close(fig)
+    plt.close('all')
     # create an array of medians according cluster on yearly period
     outliers = np.zeros(group.size)
     j = 0
@@ -142,6 +144,7 @@ def elbow_fun(group, vector_ad):
     anomaly_ticks = list(range(0, vector_ad.size, int(vector_ad.size / 5)))
     anomaly_ticks.append(num_anomalies_to_show)
     plt.xticks(anomaly_ticks)
+    plt.close('all')
 
     # create an array of medians according cluster on yearly period
     outliers = np.zeros(group.size)
@@ -260,6 +263,7 @@ def gesd_fun(group, vector_ad):
     fig, ax = plt.subplots()
     stats.probplot(vector_ad, plot=plt)
     plt.close(fig)
+    plt.close('all')
 
     n_outliers = gesd_esd_test(input_series=vector_ad, alpha=0.05, max_outliers=10)
 
