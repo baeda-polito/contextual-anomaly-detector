@@ -16,7 +16,8 @@ from src.distancematrix.calculator import AnytimeCalculator
 from src.distancematrix.consumer.contextmanager import GeneralStaticManager
 from src.distancematrix.consumer.contextual_matrix_profile import ContextualMatrixProfile
 from src.distancematrix.generator.euclidean import Euclidean
-
+from src.cmp.cart_function import run_cart
+from src.cmp.clustering_function import run_clustering
 if __name__ == '__main__':
 
     # setup logging
@@ -24,14 +25,16 @@ if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO, format='%(asctime)s [%(levelname)s](%(name)s) %(message)s')
 
     # setup argument parser
-    parser = argparse.ArgumentParser(
-        prog='Matrix profile CLI',
-        description='Matrix profile')
-    parser.add_argument('input_file', help='Path to file', type=str)
-    parser.add_argument('variable_name', help='Variable name', type=str)
-    parser.add_argument('output_file', help='Path to the output file', type=str)
-    args = parser.parse_args()
-
+    # parser = argparse.ArgumentParser(
+    #     prog='Matrix profile CLI',
+    #     description='Matrix profile')
+    # parser.add_argument('input_file', help='Path to file', type=str)
+    # parser.add_argument('variable_name', help='Variable name', type=str)
+    # parser.add_argument('output_file', help='Path to the output file', type=str)
+    # args = parser.parse_args()
+    input_file = "data/data.csv"
+    variable_name = "Total_Power"
+    output_file = "src/cmp/results/reports/report.html"
     ########################################################################################
     # define a begin time to evaluate execution time & performance of algorithm
     begin_time = datetime.datetime.now()
@@ -44,15 +47,15 @@ if __name__ == '__main__':
         'contexts': []
     }
 
-    logger.info(f"Arguments: {args}")
+    # logger.info(f"Arguments: {args}")
 
     # automatically identify the number of time windows
     # time window equal bin oppure con cart
     # set mcontext
     # k = 4 per i clusters
 
-    raw_data = download_data(args.input_file)
-    data, obs_per_day, obs_per_hour = process_data(raw_data, args.variable_name)
+    raw_data = download_data(input_file)
+    data, obs_per_day, obs_per_hour = process_data(raw_data, variable_name)
 
     ########################################################################################
     # Define configuration for the Contextual Matrix Profile calculation.
@@ -60,7 +63,7 @@ if __name__ == '__main__':
     # The number of time window has been selected from CART on total electrical power,
     # results are contained in 'time_window.csv' file
     # todo perform cart and create dataframe accordingly
-    df_time_window = pd.read_csv(os.path.join(path_to_data, "time_window_corrected.csv"))
+    df_time_window = run_cart(data.copy())
 
     # The context is defined as 1 hour before time window, to be consistent with other analysis,
     # results are loaded from 'm_context.csv' file
@@ -68,7 +71,7 @@ if __name__ == '__main__':
 
     # todo perform cluster analysis
     # Load Cluster results as boolean dataframe: each column represents a group
-    group_df = pd.read_csv(os.path.join(path_to_data, "group_cluster.csv"), index_col='timestamp', parse_dates=True)
+    group_df = run_clustering(data.copy())
     # get number of groups/clusters
     n_group = group_df.shape[1]
     cluster_summary = (f'The dataset has been clustered into {n_group} groups using K-means algorithm and displayed '
@@ -440,7 +443,7 @@ if __name__ == '__main__':
 
     # print summary with anomalies
     # print dataset main characteristics
-    summary = f'''The dataset under analysis refers to the variable '<strong>{args.variable_name}</strong>':
+    summary = f'''The dataset under analysis refers to the variable '<strong>{variable_name}</strong>':
                     <ul>
                       <li>From: {data.index[0]}</li>
                       <li>To: {data.index[len(data) - 1]}</li>
@@ -496,4 +499,4 @@ if __name__ == '__main__':
     minutes, seconds = divmod(remainder, 60)
     logger.info(f"TOTAL {str(int(minutes))} min {str(int(seconds))} s")
 
-    save_report(report_content, args.output_file)
+    save_report(report_content, output_file)
