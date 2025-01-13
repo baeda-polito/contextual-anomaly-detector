@@ -7,16 +7,15 @@ import matplotlib.pyplot as plt
 import numpy as np
 pd.set_option('display.max_rows', None)
 
-# df = pd.read_csv("data/data.csv")
 def run_clustering(data: pd.DataFrame) -> pd.DataFrame:
     """
     il dataset è filtrato dalle domeniche e festività (cluster1) e dai sabati (cluster2). viene creato poi un algoritmo
     di clustering gerarchico con metodo ward (minimizzare la varianza all'interno del cluster) sul dataset rimanente. il
     numero di cluster (n) è quello che massimizza l'indice di silhouette in un range compreso tra 3 e 6. il numero
-    finale di cluster è quindi (n + 2), ricavato grazie a divisioni domain based e algoritmo di clustering non
-    supervisionato.
+    finale di cluster è quindi (n + 2), ricavato grazie a divisioni domain based e algoritmo di clustering k-means.
     ! MODIFICARE IL CLUSTER1 CON I GIORNI DI CHIUSURA DEL POLITECNICO NON PRESENTI IN ITALIAN_HOLIDAYS !
     """
+
     data['timestamp'] = data.index
     data['timestamp'] = pd.to_datetime(data['timestamp'])
     data['date'] = data['timestamp'].dt.date
@@ -48,7 +47,6 @@ def run_clustering(data: pd.DataFrame) -> pd.DataFrame:
         score = silhouette_score(wd_daily_matrix, cluster_labels)
         silhouette_scores.append(score)
     optimal_clusters = range_clusters[silhouette_scores.index(max(silhouette_scores))]
-    # print(f"Numero ottimale di cluster: {optimal_clusters}")
     final_clustering = AgglomerativeClustering(n_clusters=optimal_clusters, linkage='ward')
     final_labels = final_clustering.fit_predict(wd_daily_matrix) + 3
     wd_daily_matrix['Cluster'] = final_labels
@@ -69,6 +67,8 @@ def run_clustering(data: pd.DataFrame) -> pd.DataFrame:
             wd_daily_matrix[wd_daily_matrix['Cluster'] == i].index
         )
     # print(group_cluster)
+    print(f"Number of cluster: {optimal_clusters + 2}") # +2 uno per i sabati e uno per domenica e festivi
+    print(f"Silouette score: {round(max(silhouette_scores),2)}")
     group_cluster.to_csv('data/group_cluster_new.csv', index=False)
     return group_cluster
 

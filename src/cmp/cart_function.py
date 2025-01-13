@@ -38,10 +38,6 @@ def run_cart(data: pd.DataFrame)-> pd.DataFrame:
     X = working_days_df['time_numeric']
     y = working_days_df['value']
 
-    # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-    # X_train = X_train.values.reshape(-1, 1)
-    # X_test = X_test.values.reshape(-1, 1)
-
     def extract_intervals(tree): #fa una lista degli intervalli orari dagli split dell'albero
         cart = tree.tree_
         intervals = []
@@ -63,7 +59,9 @@ def run_cart(data: pd.DataFrame)-> pd.DataFrame:
         recurse(0)
         return intervals, nodes
 
+    n_iterations = 0
     while True:
+        n_iterations += 1
         tree = DecisionTreeRegressor(min_samples_leaf=min_samples_leaf, random_state=42)
         scores = cross_val_score(tree, X.values.reshape(-1, 1), y, cv=4, scoring='neg_mean_squared_error')
         # print(f"Cross-validation scores: {scores}")
@@ -104,6 +102,9 @@ def run_cart(data: pd.DataFrame)-> pd.DataFrame:
                 'node': nodes
             })
             time_window_corrected.to_csv('data/time_window_corrected_new.csv', index=False)
+            # print(time_window_corrected)
+            print(f"Minimum time window of 2.5h achieved after {n_iterations} iterations.")
+            print(f"Minimum number of samples in leaf nodes of CART: {min_samples_leaf}")
             break
         else:
             min_samples_leaf += 500
