@@ -61,19 +61,17 @@ def run_clustering(data: pd.DataFrame) -> pd.DataFrame:
 
     #CSV FINALE
     group_cluster = pd.DataFrame({'timestamp': pd.to_datetime(data['date'].unique())})
-    group_cluster['Cluster_1'] = group_cluster['timestamp'].dt.date.isin(Cluster1['date']).map(
-        {True: 'TRUE', False: 'FALSE'})
-    group_cluster['Cluster_2'] = group_cluster['timestamp'].dt.date.isin(Cluster2['date']).map(
-        {True: 'TRUE', False: 'FALSE'})
+    group_cluster['Cluster_1'] = group_cluster['timestamp'].dt.date.isin(Cluster1['date'])
+    group_cluster['Cluster_2'] = group_cluster['timestamp'].dt.date.isin(Cluster2['date'])
     for i in range(3, optimal_clusters + 3):
         col_name = f'Cluster_{i}'
-        group_cluster[col_name] = np.where(
-            group_cluster['timestamp'].dt.date.isin(
-                wd_daily_matrix[wd_daily_matrix['Cluster'] == i].index
-            ),
-            'TRUE',
-            'FALSE'
+        group_cluster[col_name] = group_cluster['timestamp'].dt.date.isin(
+            wd_daily_matrix[wd_daily_matrix['Cluster'] == i].index
         )
-    print(group_cluster)
-    # group_cluster.to_csv('data/group_cluster_prova.csv', index=False)
-    return data
+    # print(group_cluster)
+    group_cluster.to_csv('data/group_cluster_new.csv', index=False)
+    return group_cluster
+
+if __name__ == '__main__':
+    df = pd.read_csv("data/data.csv")
+    run_clustering(df)

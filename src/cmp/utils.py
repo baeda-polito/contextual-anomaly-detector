@@ -56,7 +56,7 @@ def save_report(context, filepath: str) -> None:
     html_content = template.render(context)
 
     # Save the rendered HTML to a file (optional, for inspection)
-    with open(filepath, 'w') as file:
+    with open(filepath, 'w', encoding='utf-8') as file:  # Specifica UTF-8
         file.write(html_content)
         logger.info(f'🎉 Report generated successfully on {filepath}')
 

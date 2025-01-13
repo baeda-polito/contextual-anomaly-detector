@@ -18,12 +18,14 @@ from src.distancematrix.consumer.contextual_matrix_profile import ContextualMatr
 from src.distancematrix.generator.euclidean import Euclidean
 from src.cmp.cart_function import run_cart
 from src.cmp.clustering_function import run_clustering
+
 if __name__ == '__main__':
 
     # setup logging
     logger = logging.getLogger(__name__)
     logging.basicConfig(level=logging.INFO, format='%(asctime)s [%(levelname)s](%(name)s) %(message)s')
 
+    # setup argument parser
     # setup argument parser
     # parser = argparse.ArgumentParser(
     #     prog='Matrix profile CLI',
@@ -34,7 +36,8 @@ if __name__ == '__main__':
     # args = parser.parse_args()
     input_file = "data/data.csv"
     variable_name = "Total_Power"
-    output_file = "src/cmp/results/reports/report.html"
+    output_file = "results/reports/report.html"
+
     ########################################################################################
     # define a begin time to evaluate execution time & performance of algorithm
     begin_time = datetime.datetime.now()
@@ -67,11 +70,13 @@ if __name__ == '__main__':
 
     # The context is defined as 1 hour before time window, to be consistent with other analysis,
     # results are loaded from 'm_context.csv' file
-    m_context = 1 # [h]
+    m_context = 1  # [h]
 
     # todo perform cluster analysis
     # Load Cluster results as boolean dataframe: each column represents a group
     group_df = run_clustering(data.copy())
+    group_df['timestamp'] = pd.to_datetime(group_df['timestamp'])
+    group_df.set_index('timestamp', inplace=True)
     # get number of groups/clusters
     n_group = group_df.shape[1]
     cluster_summary = (f'The dataset has been clustered into {n_group} groups using K-means algorithm and displayed '
@@ -115,7 +120,7 @@ if __name__ == '__main__':
         columns=["from", "to", "context_string", "context_string_small", "duration", "observations"])
 
     anomalies_table_overall = pd.DataFrame()
-    
+
     # begin for loop on the number of time windows
     for id_tw in range(len(df_time_window)):
 

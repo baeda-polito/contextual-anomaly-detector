@@ -66,8 +66,8 @@ def run_cart(data: pd.DataFrame)-> pd.DataFrame:
     while True:
         tree = DecisionTreeRegressor(min_samples_leaf=min_samples_leaf, random_state=42)
         scores = cross_val_score(tree, X.values.reshape(-1, 1), y, cv=4, scoring='neg_mean_squared_error')
-        print(f"Cross-validation scores: {scores}")
-        print(f"Mean of cross-validation scores: {-scores.mean()}")
+        # print(f"Cross-validation scores: {scores}")
+        # print(f"Mean of cross-validation scores: {-scores.mean()}")
         tree.fit(X.values.reshape(-1, 1), y)
 
         intervals, nodes = extract_intervals(tree)
@@ -76,16 +76,17 @@ def run_cart(data: pd.DataFrame)-> pd.DataFrame:
         intervals_duration = [(end - start) for start, end in rounded_intervals]
 
         if all(duration >= min_interval_length for duration in intervals_duration):
-            plt.figure(figsize=(20, 10))
-            plot_tree(tree, feature_names=['time_numeric'], filled=True, fontsize=10)
-            plt.show()
+            # plt.figure(figsize=(20, 10))
+            # plot_tree(tree, feature_names=['time_numeric'], filled=True, fontsize=10)
+            # plt.show()
             time_window_corrected = pd.DataFrame({
                 'id': range(1, len(rounded_intervals) + 1),
                 'description': [
                     f"[{int(start):02d}:{int((start % 1) * 60):02d} - {int(end):02d}:{int((end % 1) * 60):02d})"
                     for start, end in rounded_intervals
                 ],
-                'observations': [ (end-start)*4
+                'observations': [
+                    int((end - start) * 4)
                     for start, end in rounded_intervals
                 ],
                 'from': [
@@ -102,12 +103,12 @@ def run_cart(data: pd.DataFrame)-> pd.DataFrame:
                 ],
                 'node': nodes
             })
-            # time_window_corrected.to_csv('data/time_window_corrected_prova.csv', index=False)
+            time_window_corrected.to_csv('data/time_window_corrected_new.csv', index=False)
             break
         else:
             min_samples_leaf += 500
 
-    return data
+    return time_window_corrected
 
 if __name__ == '__main__':
     df = pd.read_csv("data/data.csv")
