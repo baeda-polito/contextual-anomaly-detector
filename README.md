@@ -35,6 +35,7 @@ positional arguments:
   input_file     Path to file
   variable_name  Variable name
   output_file    Path to the output file
+  country        Country code [optional]
 
 options:
   -h, --help     show this help message and exit
@@ -47,8 +48,9 @@ The arguments to pass to the script are the following:
 * `variable_name`: The variable name to be used for the analysis (i.e., the column of the csv that contains the
   electrical load under analysis).
 * `output_file`: The local path to the output HTML report. The platform would then get that HTML report and upload it to
-  the object
-  storage service for the user to review later.
+  the object storage service for the user to review later.
+* `country`: The country code of the location where the building is located. This is used to get the holidays for that
+  country.
 
 You can run the main script through the console using either local files or download data from an external url. This
 repository comes with a sample dataset ([data.csv](.src/cmp/data/data.csv)) that you can use to generate a report and
@@ -172,6 +174,8 @@ following plain text citation
 ## Contributors
 
 - Author [Roberto Chiosa](https://github.com/RobertoChiosa)
+- Contributor [Rocco Giudice](https://github.com/Giudice7)
+- Contributor [Vincenzo Viggiano]()
 
 ## References
 

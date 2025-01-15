@@ -11,6 +11,7 @@ import matplotlib.ticker as mticker
 import numpy as np
 import pandas as pd
 import requests
+import holidays
 from jinja2 import Environment, FileSystemLoader
 
 # Path to folders
@@ -56,7 +57,7 @@ def save_report(context, filepath: str) -> None:
     html_content = template.render(context)
 
     # Save the rendered HTML to a file (optional, for inspection)
-    with open(filepath, 'w') as file:
+    with open(filepath, 'w', encoding='utf-8') as file:  # Specifica UTF-8
         file.write(html_content)
         logger.info(f'🎉 Report generated successfully on {filepath}')
 
@@ -114,6 +115,28 @@ def process_data(data_raw: pd.DataFrame, variable: str) -> tuple:
     except Exception as e:
         logger.error(f"🔴 Error processing data: {e}")
         raise
+
+
+def extract_holidays(data: pd.DataFrame, country_code: str) -> pd.DataFrame:
+    """Extract holidays from the dataset and the country code
+
+    :param data: data already processed
+    :param country_code: country code to extract holidays
+
+    :return: holidays dataframe
+    """
+
+    holidays_country = holidays.country_holidays(country_code)
+    data['date'] = data.index.date
+
+    dates = data['date'].unique()
+
+    df_holidays = pd.DataFrame(columns=['holiday'])
+    for date in dates:
+        if date in holidays_country:
+            df_holidays.loc[date, "holiday"] = holidays_country.get(date)
+
+    return df_holidays
 
 
 def ensure_dir(dir_path: str) -> None:

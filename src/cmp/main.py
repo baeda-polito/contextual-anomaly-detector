@@ -1,9 +1,9 @@
 #  Copyright © Roberto Chiosa 2024.
 #  Email: roberto.chiosa@polito.it
-#  Last edited: 23/9/2024
+#  Last edited: 15/1/2025
 
 import argparse
-import datetime  # data
+import datetime
 from statistics import mean
 
 import plotly.express as px
@@ -16,6 +16,8 @@ from src.distancematrix.calculator import AnytimeCalculator
 from src.distancematrix.consumer.contextmanager import GeneralStaticManager
 from src.distancematrix.consumer.contextual_matrix_profile import ContextualMatrixProfile
 from src.distancematrix.generator.euclidean import Euclidean
+from src.cmp.cart_function import run_cart
+from src.cmp.clustering_function import run_clustering
 
 if __name__ == '__main__':
 
@@ -29,7 +31,8 @@ if __name__ == '__main__':
         description='Matrix profile')
     parser.add_argument('input_file', help='Path to file', type=str)
     parser.add_argument('variable_name', help='Variable name', type=str)
-    parser.add_argument('output_file', help='Path to the output file', type=str)
+    parser.add_argument('output_file', help='Path to the output file', type=str, default=None)
+    parser.add_argument('-country', help='The country code as defined by https://pypi.org/project/holidays/', type=str)
     args = parser.parse_args()
 
     ########################################################################################
@@ -46,34 +49,40 @@ if __name__ == '__main__':
 
     logger.info(f"Arguments: {args}")
 
-    # automatically identify the number of time windows
-    # time window equal bin oppure con cart
-    # set mcontext
-    # k = 4 per i clusters
-
     raw_data = download_data(args.input_file)
     data, obs_per_day, obs_per_hour = process_data(raw_data, args.variable_name)
+
+    if args.country is not None:
+        df_holidays = extract_holidays(data, args.country)
+        df_holidays_dates = pd.to_datetime(df_holidays.index).date
+        data_no_holidays = data[~np.isin(data.index.date, df_holidays)]
+        string_holidays = ""
+        for row in df_holidays.itertuples():
+            string_holidays += f"{row[0]}: {row[1]} --- "
+        logger.info(f"📅 The following holidays are identified: {string_holidays}")
+    else:
+        logger.info("📅 No holidays are identified in the dataset.")
+        data_no_holidays = data.copy()
+        df_holidays = None
 
     ########################################################################################
     # Define configuration for the Contextual Matrix Profile calculation.
 
     # The number of time window has been selected from CART on total electrical power,
     # results are contained in 'time_window.csv' file
-    # todo perform cart and create dataframe accordingly
-    df_time_window = pd.read_csv(os.path.join(path_to_data, "time_window_corrected.csv"))
+    df_time_window = run_cart(data_no_holidays.copy())
 
     # The context is defined as 1 hour before time window, to be consistent with other analysis,
     # results are loaded from 'm_context.csv' file
-    m_context = 1 # [h]
+    m_context = 1  # [h]
 
-    # todo perform cluster analysis
-    # Load Cluster results as boolean dataframe: each column represents a group
-    group_df = pd.read_csv(os.path.join(path_to_data, "group_cluster.csv"), index_col='timestamp', parse_dates=True)
-    # get number of groups/clusters
+    group_df = run_clustering(data.copy(), df_holidays)
+    group_df['timestamp'] = pd.to_datetime(group_df['timestamp'])
+    group_df.set_index('timestamp', inplace=True)
     n_group = group_df.shape[1]
-    cluster_summary = (f'The dataset has been clustered into {n_group} groups using K-means algorithm and displayed '
-                       f'in the following image. The clusters group similar daily '
-                       f'load profiles for which the contextual matrix profile calculation will be performed.')
+    cluster_summary = (f'The dataset has been clustered into {n_group} groups using Hierarchical clustering algorithm and '
+                       f'displayed in the following image. The clusters group similar daily '
+                       f'load profiles for which the Contextual Matrix Profile calculation will be performed.')
 
     cluster_data_plot = data.copy()
     cluster_data_plot.reset_index(inplace=True)
@@ -112,7 +121,7 @@ if __name__ == '__main__':
         columns=["from", "to", "context_string", "context_string_small", "duration", "observations"])
 
     anomalies_table_overall = pd.DataFrame()
-    
+
     # begin for loop on the number of time windows
     for id_tw in range(len(df_time_window)):
 
@@ -123,8 +132,8 @@ if __name__ == '__main__':
             context_start = 0  # [hours] i.e., 00:00
             context_end = context_start + m_context  # [hours] i.e., 01:00
             # [observations] = ([hour]-[hour])*[observations/hour]
-            # m = int((hour_to_dec(df_time_window["to"][id_tw]) - 0.25 - m_context) * obs_per_hour)
-            m = 23
+            m = int((hour_to_dec(df_time_window["to"][id_tw]) - 0.25 - m_context) * obs_per_hour)
+            # m = 23
         else:
             m = df_time_window["observations"][id_tw]  # [observations]
             context_end = hour_to_dec(df_time_window["from"][id_tw]) + 0.25  # [hours]
@@ -303,8 +312,6 @@ if __name__ == '__main__':
                 group=group,
                 vector_ad=vector_ad_temperature)
 
-            # temperature_ad_score = stats.zscore(vector_ad_temperature)
-
             # add anomaly score to df_result_context_cluster
             df_result_context_cluster["cmp_score"] = cmp_ad_score
             df_result_context_cluster["energy_score"] = energy_ad_score
@@ -440,7 +447,7 @@ if __name__ == '__main__':
 
     # print summary with anomalies
     # print dataset main characteristics
-    summary = f'''The dataset under analysis refers to the variable '<strong>{args.variable_name}</strong>':
+    summary = f'''The dataset under analysis refers to the variable '<strong>{variable_name}</strong>':
                     <ul>
                       <li>From: {data.index[0]}</li>
                       <li>To: {data.index[len(data) - 1]}</li>
@@ -496,4 +503,4 @@ if __name__ == '__main__':
     minutes, seconds = divmod(remainder, 60)
     logger.info(f"TOTAL {str(int(minutes))} min {str(int(seconds))} s")
 
-    save_report(report_content, args.output_file)
+    save_report(report_content, output_file)
