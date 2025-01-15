@@ -1,13 +1,15 @@
+from typing import Union
+
+import logging
 import pandas as pd
-import holidays
-from scipy.cluster.hierarchy import linkage, dendrogram
 from sklearn.cluster import AgglomerativeClustering
 from sklearn.metrics import silhouette_score
-import matplotlib.pyplot as plt
-import numpy as np
-pd.set_option('display.max_rows', None)
 
-def run_clustering(data: pd.DataFrame) -> pd.DataFrame:
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO, format='%(asctime)s [%(levelname)s](%(name)s) %(message)s')
+
+
+def run_clustering(data: pd.DataFrame, df_holidays: Union[None, pd.DataFrame]) -> pd.DataFrame:
     """
     il dataset è filtrato dalle domeniche e festività (cluster1) e dai sabati (cluster2). viene creato poi un algoritmo
     di clustering gerarchico con metodo ward (minimizzare la varianza all'interno del cluster) sul dataset rimanente. il
@@ -16,29 +18,32 @@ def run_clustering(data: pd.DataFrame) -> pd.DataFrame:
     ! MODIFICARE IL CLUSTER1 CON I GIORNI DI CHIUSURA DEL POLITECNICO NON PRESENTI IN ITALIAN_HOLIDAYS !
     """
 
-    data['timestamp'] = data.index
-    data['timestamp'] = pd.to_datetime(data['timestamp'])
-    data['date'] = data['timestamp'].dt.date
-    data['time'] = data['timestamp'].dt.time
+    logging.info("🌲 Running Hierarchical clustering algorithm with ward linkage method.")
 
-    #CLUSTER1
-    italian_holidays = holidays.IT()
-    holiday_sunday_dates = [
-        date for date in data['date'].unique()
-        if pd.Timestamp(date).weekday() == 6 or date in italian_holidays
-    ]
-    Cluster1 = pd.DataFrame({'date': holiday_sunday_dates})
-    #CLUSTER2
+    data['date'] = data.index.date
+    data['time'] = data.index.time
+
+    if df_holidays is not None:
+        # of sundays and holidays
+        sunday_dates = [
+            date for date in data['date'].unique()
+            if pd.Timestamp(date).weekday() == 6 or date in df_holidays.index
+        ]
+    else:
+        # Only sundays
+        sunday_dates = [date for date in data['date'].unique() if pd.Timestamp(date).weekday() == 6]
+    Cluster1 = pd.DataFrame({'date': sunday_dates})
+
+    # Cluster of saturdays
     saturdays = [
         date for date in data['date'].unique()
         if pd.Timestamp(date).weekday() == 5
     ]
     Cluster2 = pd.DataFrame({'date': saturdays})
 
-    #CLUSTERING GERARCHICO
+    # Hierarchical clustering
     df_working_days = data[~data['date'].isin(set(Cluster1['date']).union(set(Cluster2['date'])))][['value', 'date', 'time']]
     wd_daily_matrix = df_working_days.pivot(index='date', columns='time', values='value')
-    linkage_matrix = linkage(wd_daily_matrix, method='ward')
     range_clusters = range(3, 7)
     silhouette_scores = []
     for n_clusters in range_clusters:
@@ -50,28 +55,16 @@ def run_clustering(data: pd.DataFrame) -> pd.DataFrame:
     final_clustering = AgglomerativeClustering(n_clusters=optimal_clusters, linkage='ward')
     final_labels = final_clustering.fit_predict(wd_daily_matrix) + 3
     wd_daily_matrix['Cluster'] = final_labels
-    plt.figure(figsize=(10, 6))
-    dendrogram(linkage_matrix)
-    plt.title("Dendrogramma - Metodo Ward")
-    plt.xlabel("Profili di carico giornaliero")
-    plt.ylabel("Distanza")
-    # plt.show()
 
-    #CSV FINALE
+    # Grouping clusters
     group_cluster = pd.DataFrame({'timestamp': pd.to_datetime(data['date'].unique())})
     group_cluster['Cluster_1'] = group_cluster['timestamp'].dt.date.isin(Cluster1['date'])
     group_cluster['Cluster_2'] = group_cluster['timestamp'].dt.date.isin(Cluster2['date'])
     for i in range(3, optimal_clusters + 3):
-        col_name = f'Cluster_{i}'
-        group_cluster[col_name] = group_cluster['timestamp'].dt.date.isin(
+        group_cluster[f'Cluster_{i}'] = group_cluster['timestamp'].dt.date.isin(
             wd_daily_matrix[wd_daily_matrix['Cluster'] == i].index
         )
-    # print(group_cluster)
-    print(f"Number of cluster: {optimal_clusters + 2}") # +2 uno per i sabati e uno per domenica e festivi
-    print(f"Silouette score: {round(max(silhouette_scores),2)}")
-    group_cluster.to_csv('data/group_cluster_new.csv', index=False)
-    return group_cluster
 
-if __name__ == '__main__':
-    df = pd.read_csv("data/data.csv")
-    run_clustering(df)
+    logging.info(f"📊 Clustering algorithm completed successfully. Final number of cluster: {optimal_clusters + 2}")
+
+    return group_cluster
