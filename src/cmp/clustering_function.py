@@ -11,11 +11,14 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s [%(levelname)s](%(na
 
 def run_clustering(data: pd.DataFrame, df_holidays: Union[None, pd.DataFrame]) -> pd.DataFrame:
     """
-    il dataset è filtrato dalle domeniche e festività (cluster1) e dai sabati (cluster2). viene creato poi un algoritmo
-    di clustering gerarchico con metodo ward (minimizzare la varianza all'interno del cluster) sul dataset rimanente. il
-    numero di cluster (n) è quello che massimizza l'indice di silhouette in un range compreso tra 3 e 6. il numero
-    finale di cluster è quindi (n + 2), ricavato grazie a divisioni domain based e algoritmo di clustering k-means.
-    ! MODIFICARE IL CLUSTER1 CON I GIORNI DI CHIUSURA DEL POLITECNICO NON PRESENTI IN ITALIAN_HOLIDAYS !
+    Run hierarchical clustering algorithm with ward linkage method. The algorithm will cluster the data into 2 fixed clusters (sundays and saturdays) and a variable number of clusters for the working days.
+    In particular, the number of clusters for the working days is determined by the silhouette score between 3 and 6 clusters.
+    In this way are returned between 5 and 8 clusters in total.
+
+    :param data: DataFrame with the data to cluster. It must have a datetime index and a column 'value' with the values to cluster.
+    :param df_holidays: DataFrame with the holidays. It must have a datetime.date index.
+
+    :return: DataFrame with the clusters. The rows are the dates and the columns are the clusters. The columns are named as 'Cluster_1', 'Cluster_2', ..., 'Cluster_n'.
     """
 
     logging.info("🌲 Running Hierarchical clustering algorithm with ward linkage method.")
@@ -42,7 +45,8 @@ def run_clustering(data: pd.DataFrame, df_holidays: Union[None, pd.DataFrame]) -
     Cluster2 = pd.DataFrame({'date': saturdays})
 
     # Hierarchical clustering
-    df_working_days = data[~data['date'].isin(set(Cluster1['date']).union(set(Cluster2['date'])))][['value', 'date', 'time']]
+    df_working_days = data[~data['date'].isin(set(Cluster1['date']).union(set(Cluster2['date'])))][
+        ['value', 'date', 'time']]
     wd_daily_matrix = df_working_days.pivot(index='date', columns='time', values='value')
     range_clusters = range(3, 7)
     silhouette_scores = []
