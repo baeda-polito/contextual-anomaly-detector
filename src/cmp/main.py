@@ -1,9 +1,9 @@
 #  Copyright © Roberto Chiosa 2024.
 #  Email: roberto.chiosa@polito.it
-#  Last edited: 23/9/2024
+#  Last edited: 15/1/2025
 
 import argparse
-import datetime  # data
+import datetime
 from statistics import mean
 
 import plotly.express as px
