@@ -35,10 +35,10 @@ positional arguments:
   input_file     Path to file
   variable_name  Variable name
   output_file    Path to the output file
-  country        Country code [optional]
 
 options:
   -h, --help     show this help message and exit
+  -country        Country code (ex: IT, US, ...)
 ```
 
 The arguments to pass to the script are the following:
