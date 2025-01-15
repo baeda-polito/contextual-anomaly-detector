@@ -32,7 +32,7 @@ if __name__ == '__main__':
     parser.add_argument('input_file', help='Path to file', type=str)
     parser.add_argument('variable_name', help='Variable name', type=str)
     parser.add_argument('output_file', help='Path to the output file', type=str, default=None)
-    parser.add_argument('country', help='The country code as defined by https://pypi.org/project/holidays/', type=str)
+    parser.add_argument('-country', help='The country code as defined by https://pypi.org/project/holidays/', type=str)
     args = parser.parse_args()
 
     ########################################################################################
