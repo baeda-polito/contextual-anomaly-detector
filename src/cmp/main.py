@@ -43,7 +43,7 @@ if __name__ == '__main__':
     report_content = {
         'title': 'Anomaly detection report',
         'subtitle': f'Generated on {begin_time.strftime("%Y-%m-%d %H:%M:%S")}',
-        'footer_text': '© 2024 Roberto Chiosa',
+        'footer_text': '© 2024 Baeda Lab. (http://www.baeda.polito.it/)\nContributors: Roberto Chiosa, Marco Savino Piscitelli, Alfonso Capozzoli',
         'contexts': []
     }
 
