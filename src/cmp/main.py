@@ -348,7 +348,8 @@ if __name__ == '__main__':
                 "plot": fig.to_html(full_html=False),
                 "table": anomalies_table.to_html(index=False,
                                                  classes='table table-striped table-hover',
-                                                 border=0, ),
+                                                 border=0,
+                                                 justify='left'),
                 "plot_anomalies": None,
             })
 
@@ -447,7 +448,7 @@ if __name__ == '__main__':
 
     # print summary with anomalies
     # print dataset main characteristics
-    summary = f'''The dataset under analysis refers to the variable '<strong>{variable_name}</strong>':
+    summary = f'''The dataset under analysis refers to the variable '<strong>{args.variable_name}</strong>':
                     <ul>
                       <li>From: {data.index[0]}</li>
                       <li>To: {data.index[len(data) - 1]}</li>
@@ -503,4 +504,4 @@ if __name__ == '__main__':
     minutes, seconds = divmod(remainder, 60)
     logger.info(f"TOTAL {str(int(minutes))} min {str(int(seconds))} s")
 
-    save_report(report_content, output_file)
+    save_report(report_content, args.output_file)
